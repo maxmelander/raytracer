@@ -2,7 +2,7 @@ const EPSILON: f64 = 0.00001;
 
 mod tuple {
     use super::EPSILON;
-    use std::ops::{Add, Sub};
+    use std::ops::{Add, Sub, Neg, Mul, Div};
 
     pub fn is_equal(a: f64, b: f64) -> bool {
         (a - b).abs() < EPSILON
@@ -56,6 +56,21 @@ mod tuple {
         pub fn w(&self) -> f64 {
             self.w
         }
+
+        pub fn magnitude(&self) -> f64 {
+            (self.x().powi(2) + self.y().powi(2) + self.z().powi(2) + self.w().powi(2)).sqrt()
+        }
+
+        //TODO: Is it better to mutate self then to return a new Tuple?
+        pub fn normalize(&self) -> Self {
+            let mag = self.magnitude();
+            Self {
+                x: self.x / mag,
+                y: self.y / mag,
+                z: self.z / mag,
+                w: self.w / mag
+            }
+        }
     }
 
     impl Add for Tuple {
@@ -80,6 +95,45 @@ mod tuple {
                 y: self.y - other.y,
                 z: self.z - other.z,
                 w: self.w - other.w
+            }
+        }
+    }
+
+    impl Neg for Tuple {
+        type Output = Self;
+
+        fn neg(self) -> Self {
+            Self {
+                x: -self.x,
+                y: -self.y,
+                z: -self.z,
+                w: -self.w
+            }
+        }
+    }
+
+    impl Mul<f64> for Tuple {
+        type Output = Self;
+
+        fn mul(self, scalar: f64) -> Self {
+            Self {
+                x: self.x * scalar,
+                y: self.y * scalar,
+                z: self.z * scalar,
+                w: self.w * scalar
+            }
+        }
+    }
+
+    impl Div<f64> for Tuple {
+        type Output = Self;
+
+        fn div(self, scalar: f64) -> Self {
+            Self {
+                x: self.x / scalar,
+                y: self.y / scalar,
+                z: self.z / scalar,
+                w: self.w / scalar
             }
         }
     }
@@ -173,5 +227,59 @@ mod tests {
         let b = Tuple::new_vector(5., 6., 7.);
         let expected = Tuple::new_vector(-2., -4., -6.);
         assert_eq!(a - b, expected);
+    }
+
+    #[test]
+    fn negate() {
+        let a = -Tuple::new_point(1.0, -2.0, 3.0);
+        assert_eq!(a.x(), -1.0);
+        assert_eq!(a.y(), 2.0);
+        assert_eq!(a.z(), -3.0);
+        assert_eq!(a.w(), -1.0);
+    }
+
+    #[test]
+    fn scalar_mul() {
+        let a = Tuple::new_point(1.0, -2.0, 3.0);
+        let res = a * 3.5;
+        assert_eq!(res.x(), 3.5);
+        assert_eq!(res.y(), -7.0);
+        assert_eq!(res.z(), 10.5);
+        assert_eq!(res.w(), 3.5);
+    }
+
+    #[test]
+    fn scalar_div() {
+        let a = Tuple::new_point(1.0, -2.0, 3.0);
+        let res = a / 2.0;
+        assert_eq!(res.x(), 0.5);
+        assert_eq!(res.y(), -1.0);
+        assert_eq!(res.z(), 1.5);
+        assert_eq!(res.w(), 0.5);
+    }
+
+    #[test]
+    fn magnitude() {
+        let a = Tuple::new_vector(1.0, 0.0, 0.0);
+        let b = Tuple::new_vector(0.0, 1.0, 0.0);
+        let c = Tuple::new_vector(0.0, 0.0, 1.0);
+        let d = Tuple::new_vector(1.0, 2.0, 3.0);
+        let e = Tuple::new_vector(-1.0, -2.0, -3.0);
+
+        assert_eq!(a.magnitude(), 1.0);
+        assert_eq!(b.magnitude(), 1.0);
+        assert_eq!(c.magnitude(), 1.0);
+        assert_eq!(d.magnitude(), 14.0_f64.sqrt());
+        assert_eq!(e.magnitude(), 14.0_f64.sqrt());
+    }
+
+    #[test]
+    fn normalize() {
+        let a = Tuple::new_vector(4.0, 0.0, 0.0);
+        let b = Tuple::new_vector(1.0, 2.0, 3.0);
+
+        assert_eq!(a.normalize(), Tuple::new_vector(1.0, 0.0, 0.0));
+        assert_eq!(b.normalize(), Tuple::new_vector(1.0 / 14.0_f64.sqrt(), 2.0 / 14.0_f64.sqrt(), 3.0 / 14.0_f64.sqrt()));
+        assert_eq!(b.normalize().magnitude(), 1.0);
     }
 }
