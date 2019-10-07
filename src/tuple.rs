@@ -6,6 +6,7 @@ pub fn is_equal(a: f64, b: f64) -> bool {
     (a - b).abs() < EPSILON
 }
 
+#[derive(Debug)]
 pub enum TupleType {
     Point,
     Vector,
@@ -20,6 +21,7 @@ pub struct Tuple {
     w: f64,
 }
 
+#[allow(dead_code)]
 impl Tuple {
     pub fn new_point(x: f64, y: f64, z: f64) -> Self {
         Self{x: x, y: y, z: z, w: 1.0}
@@ -158,4 +160,4 @@ impl PartialEq for Tuple {
     }
 }
 
-impl Eq for Tuple {}   
+impl Eq for Tuple {}
