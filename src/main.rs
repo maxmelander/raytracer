@@ -1,7 +1,11 @@
 mod tuple;
 mod tuple_tests;
 
+mod color;
+mod color_tests;
+
 use crate::tuple::Tuple;
+use crate::color::Color;
 
 struct Projectile {
     position: Tuple,
