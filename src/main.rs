@@ -4,6 +4,9 @@ mod tuple_tests;
 mod color;
 mod color_tests;
 
+mod canvas;
+mod canvas_tests;
+
 use crate::tuple::Tuple;
 use crate::color::Color;
 
