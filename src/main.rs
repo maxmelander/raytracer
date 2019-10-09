@@ -7,6 +7,9 @@ mod color_tests;
 mod canvas;
 mod canvas_tests;
 
+mod matrix;
+mod matrix_tests;
+
 use crate::tuple::Tuple;
 use crate::color::Color;
 use crate::canvas::Canvas;
@@ -50,6 +53,6 @@ fn main() {
     }
 
     let ppm = canvas.to_ppm();
-    fs::write("/Users/maxmelander/Downloads/test.ppm", ppm).expect("Unable to write file");
+    fs::write("d:/Development/test.ppm", ppm).expect("Unable to write file");
 }
 
