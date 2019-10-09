@@ -1,6 +1,6 @@
 const EPSILON: f64 = 0.00001;
 
-use std::ops::{Add, Sub, Neg, Mul, Div, Index};
+use std::ops::{Add, Sub, Neg, Mul, Div, Index, IndexMut};
 
 pub fn is_equal(a: f64, b: f64) -> bool {
     (a - b).abs() < EPSILON
@@ -59,6 +59,12 @@ impl Index<usize> for Matrix4 {
     }
 }
 
+impl IndexMut<usize> for Matrix4 {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.data[index]
+    }
+}
+
 impl Index<usize> for Matrix3 {
     type Output = [f64; 3];
 
@@ -74,3 +80,39 @@ impl Index<usize> for Matrix2 {
         &self.data[index]
     }
 }
+
+impl Mul for Matrix4 {
+    type Output = Self;
+
+
+    fn mul(self, other: Self) -> Self {
+        let mut result = Self::new(None);
+
+        for row in 0..4 {
+            for col in 0..4 {
+                result[row][col] =
+                    (self[row][0] * other[0][col]) +
+                    (self[row][1] * other[1][col]) +
+                    (self[row][2] * other[2][col]) +
+                    (self[row][3] * other[3][col]);
+            }
+        }
+        result
+    }
+}
+
+impl PartialEq for Matrix4 {
+    fn eq(&self, other: &Self) -> bool {
+        for row in 0..4 {
+            for col in 0..4 {
+                if self[row][col] != other[row][col] {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+}
+
+impl Eq for Matrix4 {}
+
