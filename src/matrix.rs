@@ -30,6 +30,15 @@ impl Matrix4 {
             None => Self{data: [[0.0; 4]; 4]}
         }
     }
+
+    pub fn new_identity() -> Self {
+        Self{data: [
+            [1., 0., 0., 0.],
+            [0., 1., 0., 0.],
+            [0., 0., 1., 0.],
+            [0., 0., 0., 1.]
+        ]}
+    }
 }
 
 #[allow(dead_code)]

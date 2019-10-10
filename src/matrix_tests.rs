@@ -84,3 +84,22 @@ fn mul_matrix_by_tuple() {
 
     assert_eq!(a * b, expected);
 }
+
+#[test]
+fn mul_matrix_by_identity() {
+    let a = Matrix4::new(Some([
+        [1., 2., 3., 4.],
+        [2., 4., 4., 2.],
+        [8., 6., 4., 1.],
+        [0., 0., 0., 1.]
+    ]));
+
+    let expected = Matrix4::new(Some([
+        [1., 2., 3., 4.],
+        [2., 4., 4., 2.],
+        [8., 6., 4., 1.],
+        [0., 0., 0., 1.]
+    ]));
+
+    assert_eq!(a * Matrix4::new_identity(), expected);
+}
