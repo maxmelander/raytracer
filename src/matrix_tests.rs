@@ -1,5 +1,6 @@
 #[cfg(test)]
 use super::matrix::*;
+use super::tuple::Tuple;
 
 #[test]
 fn create_4x4_matrix() {
@@ -64,6 +65,22 @@ fn mul_matrices() {
         [40., 58., 110., 102.],
         [16., 26., 46., 42.]
     ]));
+
+    assert_eq!(a * b, expected);
+}
+
+#[test]
+fn mul_matrix_by_tuple() {
+    let a = Matrix4::new(Some([
+        [1., 2., 3., 4.],
+        [2., 4., 4., 2.],
+        [8., 6., 4., 1.],
+        [0., 0., 0., 1.]
+    ]));
+
+    let b = Tuple::new_point(1.0, 2.0, 3.0);
+
+    let expected = Tuple::new_point(18., 24., 33.);
 
     assert_eq!(a * b, expected);
 }

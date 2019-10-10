@@ -1,6 +1,6 @@
 const EPSILON: f64 = 0.00001;
 
-use std::ops::{Add, Sub, Neg, Mul, Div};
+use std::ops::{Add, Sub, Neg, Mul, Div, IndexMut};
 
 pub fn is_equal(a: f64, b: f64) -> bool {
     (a - b).abs() < EPSILON
@@ -15,10 +15,10 @@ pub enum TupleType {
 
 #[derive(Debug, Copy, Clone)]
 pub struct Tuple {
-    x: f64,
-    y: f64,
-    z: f64,
-    w: f64,
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
+    pub w: f64,
 }
 
 #[allow(dead_code)]
