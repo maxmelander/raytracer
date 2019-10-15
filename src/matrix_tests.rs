@@ -103,3 +103,211 @@ fn mul_matrix_by_identity() {
 
     assert_eq!(a * Matrix4::new_identity(), expected);
 }
+
+#[test]
+fn mul_identity_by_tuple() {
+    let a = Tuple::new_point(1.0, 2.0, 3.0);
+    let expected = Tuple::new_point(1.0, 2.0, 3.0);
+    assert_eq!(Matrix4::new_identity() * a, expected);
+}
+
+#[test]
+fn transpose() {
+    let a = Matrix4::new(Some([
+        [0., 9., 3., 0.],
+        [9., 8., 0., 8.],
+        [1., 8., 5., 3.],
+        [0., 0., 5., 8.],
+    ]));
+
+    let expected = Matrix4::new(Some([
+        [0., 9., 1., 0.],
+        [9., 8., 8., 0.],
+        [3., 0., 5., 5.],
+        [0., 8., 3., 8.],
+    ]));
+
+    assert_eq!(a.transpose(), expected);
+}
+
+#[test]
+fn transpose_identity() {
+    assert_eq!(Matrix4::new_identity().transpose(), Matrix4::new_identity());
+}
+
+#[test]
+fn determinant_matrix2() {
+    let a = Matrix2::new(Some([
+        [1., 5.],
+        [-3., 2.]
+    ]));
+
+    assert_eq!(a.determinant(), 17.);
+}
+
+#[test]
+fn submatrix_3_2() {
+    let a = Matrix3::new(Some([
+        [1., 5., 0.],
+        [-3., 2., 7.],
+        [0., 6., -3.],
+    ]));
+
+    let expected = Matrix2::new(Some([
+        [-3., 2.],
+        [0., 6.],
+    ]));
+
+    assert_eq!(a.submatrix(0, 2), expected);
+}
+
+#[test]
+fn submatrix_4_3() {
+    let a = Matrix4::new(Some([
+        [-6., 1., 1., 6.],
+        [-8., 5., 8., 6.],
+        [-1., 0., 8., 2.],
+        [-7., 1., -1., 1.],
+    ]));
+
+    let expected = Matrix3::new(Some([
+        [-6., 1., 6.],
+        [-8., 8., 6.],
+        [-7., -1., 1.],
+    ]));
+
+    assert_eq!(a.submatrix(2, 1), expected);
+}
+
+#[test]
+fn minor() {
+    let a = Matrix3::new(Some([
+        [3., 5., 0.],
+        [2., -1., -7.],
+        [6., -1., 5.],
+    ]));
+
+    let b = a.submatrix(1, 0);
+
+    assert_eq!(b.determinant(), 25.);
+    assert_eq!(a.minor(1,0), 25.);
+}
+
+#[test]
+fn cofactor() {
+    let a = Matrix3::new(Some([
+        [3., 5., 0.],
+        [2., -1., -7.],
+        [6., -1., 5.],
+    ]));
+
+    assert_eq!(a.minor(0, 0), -12.);
+    assert_eq!(a.cofactor(0, 0), -12.);
+    assert_eq!(a.minor(1, 0), 25.);
+    assert_eq!(a.cofactor(1, 0), -25.);
+}
+
+#[test]
+fn determinant_3() {
+    let a = Matrix3::new(Some([
+        [1., 2., 6.],
+        [-5., 8., -4.],
+        [2., 6., 4.],
+    ]));
+
+    assert_eq!(a.cofactor(0, 0), 56.);
+    assert_eq!(a.cofactor(0, 1), 12.);
+    assert_eq!(a.cofactor(0, 2), -46.);
+    assert_eq!(a.determinant(), -196.);
+}
+
+#[test]
+fn determinant_4() {
+    let a = Matrix4::new(Some([
+        [-2., -8., 3., 5.],
+        [-3., 1., 7., 3.],
+        [1., 2., -9., 6.],
+        [-6., 7., 7., -9.],
+    ]));
+
+    assert_eq!(a.cofactor(0, 0), 690.);
+    assert_eq!(a.cofactor(0, 1), 447.);
+    assert_eq!(a.cofactor(0, 2), 210.);
+    assert_eq!(a.cofactor(0, 3), 51.);
+    assert_eq!(a.determinant(), -4071.);
+}
+
+#[test]
+fn inverse() {
+    let a = Matrix4::new(Some([
+        [-5., 2., 6., -8.],
+        [1., -5., 1., 8.],
+        [7., 7., -6., -7.],
+        [1., -3., 7., 4.],
+    ]));
+
+    let b = Matrix4::new(Some([
+        [-4., 2., -2., -3.],
+        [9., 6., 2., 6.],
+        [0., -5., 1., -5.],
+        [0., 0., 0., 0.],
+    ]));
+
+    let expected = Matrix4::new(Some([
+        [0.21805, 0.45113, 0.24060, -0.04511],
+        [-0.80827, -1.45677, -0.44361, 0.52068],
+        [-0.07895, -0.22368, -0.05263, 0.19737],
+        [-0.52256, -0.81391, -0.30075, 0.30639],
+    ]));
+
+    let result = a.inverse().unwrap();
+
+    assert_eq!(a.determinant(), 532.);
+    assert_eq!(a.cofactor(2,3), -160.);
+    assert_eq!(result[3][2], -160. / 532.);
+    assert_eq!(a.cofactor(3,2), 105.);
+    assert_eq!(result[2][3], 105. / 532.);
+
+    assert_eq!(result, expected);
+    assert_eq!(b.inverse(), None);
+}
+
+#[test]
+fn inverse_2() {
+    let a = Matrix4::new(Some([
+        [8., -5., 9., 2.],
+        [7., 5., 6., 1.],
+        [-6., 0., 9., 6.],
+        [-3., 0., -9., -4.],
+    ]));
+
+    let expected = Matrix4::new(Some([
+        [-0.15385, -0.15385, -0.28205, -0.53846],
+        [-0.07692, 0.12308, 0.02564, 0.03077],
+        [0.35897, 0.35897, 0.43590, 0.92308],
+        [-0.69231, -0.69231, -0.76923, -1.92308],
+    ]));
+
+    assert_eq!(a.inverse(), Some(expected));
+}
+
+#[test]
+fn inverse_mul() {
+    let a = Matrix4::new(Some([
+        [3., -9., 7., 3.],
+        [3., -8., 2., -9.],
+        [-4., 4., 4., 1.],
+        [-6., 5., -1., 1.],
+    ]));
+
+    let b = Matrix4::new(Some([
+        [8., 2., 2., 2.],
+        [3., -1., 7., 0.],
+        [7., 0., 5., 4.],
+        [6., -2., 0., 5.],
+    ]));
+
+    let c = a * b;
+
+    assert_eq!(c * b.inverse().unwrap(), a);
+}
