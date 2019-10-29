@@ -31,6 +31,15 @@ impl Matrix4 {
         }
     }
 
+    pub fn new_translation(x: f64, y: f64, z: f64) -> Self {
+        Self{data: [
+            [1., 0., 0., x],
+            [0., 1., 0., y],
+            [0., 0., 1., z],
+            [0., 0., 0., 1.],
+        ]}
+    }
+
     pub fn new_identity() -> Self {
         Self{data: [
             [1., 0., 0., 0.],

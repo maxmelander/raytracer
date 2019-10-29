@@ -138,3 +138,5 @@ fn cross_product() {
     assert_eq!(a.cross(&b), Tuple::new_vector(-1.0, 2.0, -1.0));
     assert_eq!(b.cross(&a), Tuple::new_vector(1.0, -2.0, 1.0));
 }
+
+

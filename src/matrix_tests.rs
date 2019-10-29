@@ -311,3 +311,30 @@ fn inverse_mul() {
 
     assert_eq!(c * b.inverse().unwrap(), a);
 }
+
+#[test]
+fn translation_mul() {
+    let p = Tuple::new_point(-3.0, 4.0, 5.0);
+    let transform = Matrix4::new_translation(5.0, -3.0, 2.0);
+    let expected = Tuple::new_point(2.0, 1.0, 7.0);
+
+    assert_eq!(transform * p, expected);
+}
+
+#[test]
+fn translation_inverse_mul() {
+    let p = Tuple::new_point(-3.0, 4.0, 5.0);
+    let transform = Matrix4::new_translation(5.0, -3.0, 2.0);
+    let i_trans = transform.inverse().unwrap();
+    let expected = Tuple::new_point(-8.0, 7.0, 3.0);
+
+    assert_eq!(i_trans * p, expected);
+}
+
+#[test]
+fn translation_vec_mul() {
+    let v = Tuple::new_vector(-3.0, 4.0, 5.0);
+    let transform = Matrix4::new_translation(5.0, -3.0, 2.0);
+
+    assert_eq!(transform * v, v);
+}
