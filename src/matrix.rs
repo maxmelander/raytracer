@@ -1,6 +1,6 @@
 const EPSILON: f64 = 0.00001;
 
-use std::ops::{Add, Sub, Neg, Mul, Div, Index, IndexMut};
+use std::ops::{Mul, Div, Index, IndexMut};
 use super::tuple::Tuple;
 
 pub fn is_equal(a: f64, b: f64) -> bool {
@@ -36,6 +36,42 @@ impl Matrix4 {
             [1., 0., 0., x],
             [0., 1., 0., y],
             [0., 0., 1., z],
+            [0., 0., 0., 1.],
+        ]}
+    }
+
+    pub fn new_scaling(x: f64, y: f64, z: f64) -> Self {
+        Self{data: [
+            [x, 0., 0., 0.],
+            [0., y, 0., 0.],
+            [0., 0., z, 0.],
+            [0., 0., 0., 1.],
+        ]}
+    }
+
+    pub fn new_rotation_x(r: f64) -> Self {
+        Self{data: [
+            [1., 0., 0., 0.],
+            [0., r.cos(), -r.sin(), 0.],
+            [0., r.sin(), r.cos(), 0.],
+            [0., 0., 0., 1.],
+        ]}
+    }
+
+    pub fn new_rotation_y(r: f64) -> Self {
+        Self{data: [
+            [r.cos(), 0., r.sin(), 0.],
+            [0., 1., 0., 0.],
+            [-r.sin(), 0., r.cos(), 0.],
+            [0., 0., 0., 1.],
+        ]}
+    }
+
+    pub fn new_rotation_z(r: f64) -> Self {
+        Self{data: [
+            [r.cos(), -r.sin(), 0., 0.],
+            [r.sin(), r.cos(), 0., 0.],
+            [0., 0., 1., 0.],
             [0., 0., 0., 1.],
         ]}
     }

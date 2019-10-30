@@ -1,6 +1,7 @@
 #[cfg(test)]
 use super::matrix::*;
 use super::tuple::Tuple;
+use std::f64::consts::PI;
 
 #[test]
 fn create_4x4_matrix() {
@@ -337,4 +338,91 @@ fn translation_vec_mul() {
     let transform = Matrix4::new_translation(5.0, -3.0, 2.0);
 
     assert_eq!(transform * v, v);
+}
+
+#[test]
+fn scaling_point() {
+    let p = Tuple::new_point(-4., 6., 8.);
+    let transform = Matrix4::new_scaling(2., 3., 4.);
+    let expected = Tuple::new_point(-8., 18., 32.);
+
+    assert_eq!(transform * p, expected);
+}
+
+#[test]
+fn scaling_vector() {
+    let p = Tuple::new_vector(-4., 6., 8.);
+    let transform = Matrix4::new_scaling(2., 3., 4.);
+    let expected = Tuple::new_vector(-8., 18., 32.);
+
+    assert_eq!(transform * p, expected);
+}
+
+#[test]
+fn scaling_inverse_vector() {
+    let p = Tuple::new_vector(-4., 6., 8.);
+    let transform = Matrix4::new_scaling(2., 3., 4.);
+    let i_trans = transform.inverse().unwrap();
+    let expected = Tuple::new_vector(-2., 2., 2.);
+
+    assert_eq!(i_trans * p, expected);
+}
+
+#[test]
+fn scaling_reflection() {
+    let p = Tuple::new_point(2., 3., 4.);
+    let transform = Matrix4::new_scaling(-1., 1., 1.);
+    let expected = Tuple::new_point(-2., 3., 4.);
+
+    assert_eq!(transform * p, expected);
+}
+
+#[test]
+fn rotate_x_point() {
+    let p = Tuple::new_point(0., 1., 0.);
+    let half_quarter = Matrix4::new_rotation_x(PI / 4.);
+    let full_quarter = Matrix4::new_rotation_x(PI / 2.);
+
+    let expected_half = Tuple::new_point(0., 2_f64.sqrt() / 2., 2_f64.sqrt() / 2.);
+    let expected_full = Tuple::new_point(0., 0., 1.);
+
+    assert_eq!(half_quarter * p, expected_half);
+    assert_eq!(full_quarter * p, expected_full);
+}
+
+#[test]
+fn rotate_x_inverse_point() {
+    let p = Tuple::new_point(0., 1., 0.);
+    let half_quarter = Matrix4::new_rotation_x(PI / 4.);
+    let i_half_quarter = half_quarter.inverse().unwrap();
+
+    let expected_half = Tuple::new_point(0., 2_f64.sqrt() / 2., -2_f64.sqrt() / 2.);
+
+    assert_eq!(i_half_quarter * p, expected_half);
+}
+
+#[test]
+fn rotate_y_point() {
+    let p = Tuple::new_point(0., 0., 1.);
+    let half_quarter = Matrix4::new_rotation_y(PI / 4.);
+    let full_quarter = Matrix4::new_rotation_y(PI / 2.);
+
+    let expected_half = Tuple::new_point(2_f64.sqrt() / 2., 0., 2_f64.sqrt() / 2.);
+    let expected_full = Tuple::new_point(1., 0., 0.);
+
+    assert_eq!(half_quarter * p, expected_half);
+    assert_eq!(full_quarter * p, expected_full);
+}
+
+#[test]
+fn rotate_z_point() {
+    let p = Tuple::new_point(0., 1., 0.);
+    let half_quarter = Matrix4::new_rotation_z(PI / 4.);
+    let full_quarter = Matrix4::new_rotation_z(PI / 2.);
+
+    let expected_half = Tuple::new_point(-2_f64.sqrt() / 2., 2_f64.sqrt() / 2., 0.);
+    let expected_full = Tuple::new_point(-1., 0., 0.);
+
+    assert_eq!(half_quarter * p, expected_half);
+    assert_eq!(full_quarter * p, expected_full);
 }
