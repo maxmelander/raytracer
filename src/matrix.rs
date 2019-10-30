@@ -49,6 +49,15 @@ impl Matrix4 {
         ]}
     }
 
+    pub fn new_shearing(xy: f64, xz: f64, yx: f64, yz: f64, zx: f64, zy: f64) -> Self {
+        Self{data: [
+            [1., xy, xz, 0.],
+            [yx, 1., yz, 0.],
+            [zx, zy, 1., 0.],
+            [0., 0., 0., 1.],
+        ]}
+    }
+
     pub fn new_rotation_x(r: f64) -> Self {
         Self{data: [
             [1., 0., 0., 0.],

@@ -426,3 +426,57 @@ fn rotate_z_point() {
     assert_eq!(half_quarter * p, expected_half);
     assert_eq!(full_quarter * p, expected_full);
 }
+
+#[test]
+fn shearing_x_y() {
+    let transform = Matrix4::new_shearing(1., 0., 0., 0., 0., 0.);
+    let p = Tuple::new_point(2., 3., 4.);
+    let expected = Tuple::new_point(5., 3., 4.);
+
+    assert_eq!(transform * p, expected);
+}
+
+#[test]
+fn shearing_x_z() {
+    let transform = Matrix4::new_shearing(0., 1., 0., 0., 0., 0.);
+    let p = Tuple::new_point(2., 3., 4.);
+    let expected = Tuple::new_point(6., 3., 4.);
+
+    assert_eq!(transform * p, expected);
+}
+
+#[test]
+fn shearing_y_x() {
+    let transform = Matrix4::new_shearing(0., 0., 1., 0., 0., 0.);
+    let p = Tuple::new_point(2., 3., 4.);
+    let expected = Tuple::new_point(2., 5., 4.);
+
+    assert_eq!(transform * p, expected);
+}
+
+#[test]
+fn shearing_y_z() {
+    let transform = Matrix4::new_shearing(0., 0., 0., 1., 0., 0.);
+    let p = Tuple::new_point(2., 3., 4.);
+    let expected = Tuple::new_point(2., 7., 4.);
+
+    assert_eq!(transform * p, expected);
+}
+
+#[test]
+fn shearing_z_x() {
+    let transform = Matrix4::new_shearing(0., 0., 0., 0., 1., 0.);
+    let p = Tuple::new_point(2., 3., 4.);
+    let expected = Tuple::new_point(2., 3., 6.);
+
+    assert_eq!(transform * p, expected);
+}
+
+#[test]
+fn shearing_z_y() {
+    let transform = Matrix4::new_shearing(0., 0., 0., 0., 0., 1.);
+    let p = Tuple::new_point(2., 3., 4.);
+    let expected = Tuple::new_point(2., 3., 7.);
+
+    assert_eq!(transform * p, expected);
+}
