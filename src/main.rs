@@ -46,10 +46,10 @@ fn main() {
         velocity: Tuple::new_vector(1.0, 1.8, 0.0).normalize() * 11.25
     };
 
-    println!("Starting pos: {}", proj.position.y());
-    while proj.position.y() >= 0.0 {
+    println!("Starting pos: {}", proj.position.y);
+    while proj.position.y >= 0.0 {
         proj.tick(&env);
-        let _ = canvas.write_pixel(proj.position.x() as usize, (550_f64 - proj.position.y()) as usize, Color::new(1.0, 0.0, 1.0));
+        let _ = canvas.write_pixel(proj.position.x as usize, (550_f64 - proj.position.y) as usize, Color::new(1.0, 0.0, 1.0));
     }
 
     let ppm = canvas.to_ppm();

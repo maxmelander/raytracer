@@ -3,7 +3,7 @@ use super::tuple::*;
 #[test]
 fn create_point() -> Result<(), String> {
     let point = Tuple::new_point(4.0, -4.0, 3.0);
-    assert_eq!(point.w(), 1.0);
+    assert_eq!(point.w, 1.0);
     if let TupleType::Point = point.get_type() {
         Ok(())
     } else {
@@ -14,7 +14,7 @@ fn create_point() -> Result<(), String> {
 #[test]
 fn create_vector() -> Result<(), String> {
     let vector = Tuple::new_vector(4.0, -4.0, 3.0);
-    assert_eq!(vector.w(), 0.0);
+    assert_eq!(vector.w, 0.0);
     if let TupleType::Vector = vector.get_type() {
         Ok(())
     } else {
@@ -73,30 +73,30 @@ fn subtract_two_vectors() {
 #[test]
 fn negate() {
     let a = -Tuple::new_point(1.0, -2.0, 3.0);
-    assert_eq!(a.x(), -1.0);
-    assert_eq!(a.y(), 2.0);
-    assert_eq!(a.z(), -3.0);
-    assert_eq!(a.w(), -1.0);
+    assert_eq!(a.x, -1.0);
+    assert_eq!(a.y, 2.0);
+    assert_eq!(a.z, -3.0);
+    assert_eq!(a.w, -1.0);
 }
 
 #[test]
 fn scalar_mul() {
     let a = Tuple::new_point(1.0, -2.0, 3.0);
     let res = a * 3.5;
-    assert_eq!(res.x(), 3.5);
-    assert_eq!(res.y(), -7.0);
-    assert_eq!(res.z(), 10.5);
-    assert_eq!(res.w(), 3.5);
+    assert_eq!(res.x, 3.5);
+    assert_eq!(res.y, -7.0);
+    assert_eq!(res.z, 10.5);
+    assert_eq!(res.w, 3.5);
 }
 
 #[test]
 fn scalar_div() {
     let a = Tuple::new_point(1.0, -2.0, 3.0);
     let res = a / 2.0;
-    assert_eq!(res.x(), 0.5);
-    assert_eq!(res.y(), -1.0);
-    assert_eq!(res.z(), 1.5);
-    assert_eq!(res.w(), 0.5);
+    assert_eq!(res.x, 0.5);
+    assert_eq!(res.y, -1.0);
+    assert_eq!(res.z, 1.5);
+    assert_eq!(res.w, 0.5);
 }
 
 #[test]

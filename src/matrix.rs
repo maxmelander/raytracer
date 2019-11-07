@@ -291,10 +291,10 @@ impl Mul<Tuple> for Matrix4 {
         let mut result = Tuple::new_point(0.0, 0.0, 0.0);
         for row in 0..4 {
             let value = 
-                (self[row][0] * other.x()) +
-                (self[row][1] * other.y()) +
-                (self[row][2] * other.z()) +
-                (self[row][3] * other.w());
+                (self[row][0] * other.x) +
+                (self[row][1] * other.y) +
+                (self[row][2] * other.z) +
+                (self[row][3] * other.w);
 
             match row {
                 0 => result.x = value,

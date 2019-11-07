@@ -41,24 +41,8 @@ impl Tuple {
         }
     }
 
-    pub fn x(&self) -> f64 {
-        self.x
-    }
-
-    pub fn y(&self) -> f64 {
-        self.y
-    }
-
-    pub fn z(&self) -> f64 {
-        self.z
-    }
-
-    pub fn w(&self) -> f64 {
-        self.w
-    }
-
     pub fn magnitude(&self) -> f64 {
-        (self.x().powi(2) + self.y().powi(2) + self.z().powi(2) + self.w().powi(2)).sqrt()
+        (self.x.powi(2) + self.y.powi(2) + self.z.powi(2) + self.w.powi(2)).sqrt()
     }
 
     pub fn dot(&self, other: &Self) -> f64 {
@@ -153,10 +137,10 @@ impl Div<f64> for Tuple {
 
 impl PartialEq for Tuple {
     fn eq(&self, other: &Self) -> bool {
-        (is_equal(self.x(), other.x())
-         && is_equal(self.y(), other.y())
-         && is_equal(self.z(), other.z())
-         && is_equal(self.w(), other.w()))
+        (is_equal(self.x, other.x)
+         && is_equal(self.y, other.y)
+         && is_equal(self.z, other.z)
+         && is_equal(self.w, other.w))
     }
 }
 
