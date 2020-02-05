@@ -1,6 +1,6 @@
 const EPSILON: f64 = 0.00001;
 
-use std::ops::{Add, Sub, Neg, Mul, Div, IndexMut};
+use std::ops::{Add, Sub, Neg, Mul, Div };
 
 pub fn is_equal(a: f64, b: f64) -> bool {
     (a - b).abs() < EPSILON
@@ -29,6 +29,20 @@ impl Tuple {
 
     pub fn new_vector(x: f64, y: f64, z: f64) -> Self {
         Self{x: x, y: y, z: z, w: 0.0}
+    }
+
+    pub fn is_point(&self) -> bool {
+        if let TupleType::Point = self.get_type() {
+            return true;
+        }
+        false
+    }
+
+    pub fn is_vector(&self) -> bool {
+        if let TupleType::Vector = self.get_type() {
+            return true;
+        }
+        false
     }
 
     pub fn get_type(&self) -> TupleType {

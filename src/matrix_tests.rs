@@ -480,3 +480,34 @@ fn shearing_z_y() {
 
     assert_eq!(transform * p, expected);
 }
+
+#[test]
+fn trans_sequence() {
+    let a = Matrix4::new_rotation_x(PI / 2.);
+    let b = Matrix4::new_scaling(5., 5., 5.);
+    let c = Matrix4::new_translation(10., 5., 7.);
+    let p = Tuple::new_point(1., 0., 1.);
+
+    // Apply rotation first
+    let p2 = a * p;
+    assert_eq!(p2, Tuple::new_point(1., -1., 0.,));
+
+    // Then scaling
+    let p3 = b * p2;
+    assert_eq!(p3, Tuple::new_point(5., -5., 0.));
+
+    // Then translation
+    let p4 = c * p3;
+    assert_eq!(p4, Tuple::new_point(15., 0., 7.));
+}
+
+#[test]
+fn trans_chain() {
+    let a = Matrix4::new_rotation_x(PI / 2.);
+    let b = Matrix4::new_scaling(5., 5., 5.);
+    let c = Matrix4::new_translation(10., 5., 7.);
+    let p = Tuple::new_point(1., 0., 1.);
+
+    let t = c * b * a;
+    assert_eq!(t * p, Tuple::new_point(15., 0., 7.));
+}

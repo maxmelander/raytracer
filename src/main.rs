@@ -10,49 +10,45 @@ mod canvas_tests;
 mod matrix;
 mod matrix_tests;
 
+mod ray;
+mod ray_tests;
+
+mod sphere;
+
+use std::f64::consts::PI;
+
 use crate::tuple::Tuple;
 use crate::color::Color;
 use crate::canvas::Canvas;
+use crate::matrix::Matrix4;
 
 use std::fs;
 
-struct Projectile {
-    position: Tuple,
-    velocity: Tuple,
-}
-
-impl Projectile {
-    pub fn tick(&mut self, env: &Environment) {
-        self.position = self.position + self.velocity;
-        self.velocity = self.velocity + env.gravity + env.wind;
-    }
-}
-
-struct Environment {
-    gravity: Tuple,
-    wind: Tuple,
-}
 
 fn main() {
-    let mut canvas = Canvas::new(900, 550);
+    let width = 500;
+    let height = 500;
 
-    let env = Environment {
-        gravity: Tuple::new_vector(0., -0.1, 0.),
-        wind: Tuple::new_vector(-0.01, 0., 0.)
-    };
+    let mut canvas = Canvas::new(width, height);
 
-    let mut proj = Projectile {
-        position: Tuple::new_point(0.0, 1.0, 0.0),
-        velocity: Tuple::new_vector(1.0, 1.8, 0.0).normalize() * 11.25
-    };
+    let mut p = Tuple::new_point(0., -200., 0.);
+    let rotation = Matrix4::new_rotation_z((2. * PI) / 12.);
 
-    println!("Starting pos: {}", proj.position.y);
-    while proj.position.y >= 0.0 {
-        proj.tick(&env);
-        let _ = canvas.write_pixel(proj.position.x as usize, (550_f64 - proj.position.y) as usize, Color::new(1.0, 0.0, 1.0));
+    let _ = canvas.write_pixel(
+        (p.x + (width as f64 / 2.)) as usize,
+        (p.y + (height as f64 / 2.)) as usize,
+        Color::new(1., 0., 1.));
+
+    for _ in 1..12 {
+        p = rotation * p;
+
+        let _ = canvas.write_pixel(
+            (p.x + (width as f64 / 2.)) as usize,
+            (p.y + (height as f64 / 2.)) as usize,
+            Color::new(1., 0., 1.));
     }
 
     let ppm = canvas.to_ppm();
-    fs::write("d:/Development/test.ppm", ppm).expect("Unable to write file");
+    fs::write("/Users/maxmelander/Development/test.ppm", ppm).expect("Unable to write file");
 }
 
