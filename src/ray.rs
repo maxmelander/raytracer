@@ -1,5 +1,6 @@
 use super::tuple::Tuple;
 use super::sphere::Sphere;
+use super::intersection::Intersection;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Ray {
@@ -17,10 +18,10 @@ impl Ray {
     }
 
     pub fn position(&self, t: f64) -> Tuple {
-        return self.origin + self.direction * t;
+        self.origin + self.direction * t
     }
 
-    pub fn intersect(&self, sphere: Sphere) -> Option<[f64; 2]> {
+    pub fn intersect(&self, sphere: Sphere) -> Option<[Intersection; 2]> {
         let sphere_to_ray = self.origin - sphere.origin;
         let a = self.direction.dot(&self.direction);
         let b = 2.0 * self.direction.dot(&sphere_to_ray);
@@ -32,6 +33,6 @@ impl Ray {
 
         let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
         let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
-        Some([t1, t2])
+        Some([Intersection::new(t1, sphere), Intersection::new(t2, sphere)])
     }
 }

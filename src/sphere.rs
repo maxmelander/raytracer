@@ -1,6 +1,6 @@
 use super::tuple::Tuple;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Sphere {
     pub origin: Tuple
 }

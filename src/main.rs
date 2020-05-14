@@ -15,6 +15,8 @@ mod ray_tests;
 
 mod sphere;
 
+mod intersection;
+
 use std::f64::consts::PI;
 
 use crate::tuple::Tuple;
