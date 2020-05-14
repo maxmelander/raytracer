@@ -149,3 +149,46 @@ fn intersect_sets_object_on_intersection() {
     assert_eq!(xs[0].object, s);
     assert_eq!(xs[1].object, s);
 }
+
+#[test]
+fn hit_all_positive() {
+    let s = Sphere::new();
+    let i1 = Intersection::new(1., s);
+    let i2 = Intersection::new(2., s);
+    let xs = vec![i1, i2];
+    let i = hit(&xs);
+    assert_eq!(i, Some(&i1));
+}
+
+#[test]
+fn hit_some_negative() {
+    let s = Sphere::new();
+    let i1 = Intersection::new(-1., s);
+    let i2 = Intersection::new(1., s);
+    let xs = vec![i1, i2];
+    let i = hit(&xs);
+    assert_eq!(i, Some(&i2));
+}
+
+
+#[test]
+fn hit_all_negative() {
+    let s = Sphere::new();
+    let i1 = Intersection::new(-2., s);
+    let i2 = Intersection::new(-1., s);
+    let xs = vec![i1, i2];
+    let i = hit(&xs);
+    assert_eq!(i, None);
+}
+
+#[test]
+fn hit_lowest_non_negative() {
+    let s = Sphere::new();
+    let i1 = Intersection::new(5., s);
+    let i2 = Intersection::new(7., s);
+    let i3 = Intersection::new(-3., s);
+    let i4 = Intersection::new(2., s);
+    let xs = vec![i1, i2, i3, i4];
+    let i = hit(&xs);
+    assert_eq!(i, Some(&i4));
+}
