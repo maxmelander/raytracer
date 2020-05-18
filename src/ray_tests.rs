@@ -3,6 +3,7 @@ use super::sphere::*;
 use super::ray::*;
 use super::tuple::*;
 use super::intersection::*;
+use super::matrix::*;
 
 #[test]
 fn create_ray() {
@@ -191,4 +192,64 @@ fn hit_lowest_non_negative() {
     let xs = vec![i1, i2, i3, i4];
     let i = hit(&xs);
     assert_eq!(i, Some(&i4));
+}
+
+#[test]
+fn ray_translation() {
+    let r = Ray::new(
+        Tuple::new_point(1., 2., 3.),
+        Tuple::new_vector(0., 1., 0.)
+    ).unwrap();
+
+    let m = Matrix4::new_translation(3., 4., 5.);
+
+    let r2 = r.transform(m);
+
+    assert_eq!(r2.origin, Tuple::new_point(4., 6., 8.));
+    assert_eq!(r2.direction, Tuple::new_vector(0., 1., 0.));
+}
+
+#[test]
+fn ray_scaling() {
+    let r = Ray::new(
+        Tuple::new_point(1., 2., 3.),
+        Tuple::new_vector(0., 1., 0.)
+    ).unwrap();
+
+    let m = Matrix4::new_scaling(2., 3., 4.);
+
+    let r2 = r.transform(m);
+
+    assert_eq!(r2.origin, Tuple::new_point(2., 6., 12.));
+    assert_eq!(r2.direction, Tuple::new_vector(0., 3., 0.));
+}
+
+#[test]
+fn scaled_sphere_intersect() {
+    let r = Ray::new(
+        Tuple::new_point(0., 0., -5.),
+        Tuple::new_vector(0., 0., 1.)
+    ).unwrap();
+
+    let s = Sphere::new_with_transform(Matrix4::new_scaling(2., 2., 2.));
+
+    let xs = r.intersect(s).unwrap();
+
+    assert_eq!(xs.len(), 2);
+    assert_eq!(xs[0].t, 3.);
+    assert_eq!(xs[1].t, 7.);
+}
+
+#[test]
+fn translated_sphere_intersect() {
+    let r = Ray::new(
+        Tuple::new_point(0., 0., -5.),
+        Tuple::new_vector(0., 0., 1.)
+    ).unwrap();
+
+    let s = Sphere::new_with_transform(Matrix4::new_translation(5., 0., 0.));
+
+    let xs = r.intersect(s);
+
+    assert_eq!(xs, None);
 }
