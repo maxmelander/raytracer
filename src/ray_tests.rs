@@ -1,9 +1,9 @@
-#[cfg(test)]
-use super::sphere::*;
-use super::ray::*;
-use super::tuple::*;
 use super::intersection::*;
 use super::matrix::*;
+use super::ray::*;
+#[cfg(test)]
+use super::sphere::*;
+use super::tuple::*;
 
 #[test]
 fn create_ray() {
@@ -18,11 +18,7 @@ fn create_ray() {
 
 #[test]
 fn point_from_dist() {
-    let ray = Ray::new(
-        Tuple::new_point(2., 3., 4.),
-        Tuple::new_vector(1., 0., 0.)
-    ).unwrap();
-
+    let ray = Ray::new(Tuple::new_point(2., 3., 4.), Tuple::new_vector(1., 0., 0.)).unwrap();
 
     assert_eq!(ray.position(0.), Tuple::new_point(2., 3., 4.));
     assert_eq!(ray.position(1.), Tuple::new_point(3., 3., 4.));
@@ -32,10 +28,7 @@ fn point_from_dist() {
 
 #[test]
 fn ray_sphere_intersects() {
-    let ray = Ray::new(
-        Tuple::new_point(0., 0., -5.),
-        Tuple::new_vector(0., 0., 1.)
-    ).unwrap();
+    let ray = Ray::new(Tuple::new_point(0., 0., -5.), Tuple::new_vector(0., 0., 1.)).unwrap();
 
     let sphere = Sphere::new();
 
@@ -48,10 +41,7 @@ fn ray_sphere_intersects() {
 
 #[test]
 fn ray_sphere_tangent_intersect() {
-    let r = Ray::new(
-        Tuple::new_point(0., 1., -5.),
-        Tuple::new_vector(0., 0., 1.)
-    ).unwrap();
+    let r = Ray::new(Tuple::new_point(0., 1., -5.), Tuple::new_vector(0., 0., 1.)).unwrap();
 
     let s = Sphere::new();
 
@@ -64,10 +54,7 @@ fn ray_sphere_tangent_intersect() {
 
 #[test]
 fn ray_sphere_miss() {
-    let r = Ray::new(
-        Tuple::new_point(0., 2., -5.),
-        Tuple::new_vector(0., 0., 1.)
-    ).unwrap();
+    let r = Ray::new(Tuple::new_point(0., 2., -5.), Tuple::new_vector(0., 0., 1.)).unwrap();
 
     let s = Sphere::new();
 
@@ -78,10 +65,7 @@ fn ray_sphere_miss() {
 
 #[test]
 fn ray_sphere_inside() {
-    let r = Ray::new(
-        Tuple::new_point(0., 0., 0.),
-        Tuple::new_vector(0., 0., 1.)
-    ).unwrap();
+    let r = Ray::new(Tuple::new_point(0., 0., 0.), Tuple::new_vector(0., 0., 1.)).unwrap();
 
     let s = Sphere::new();
 
@@ -94,10 +78,7 @@ fn ray_sphere_inside() {
 
 #[test]
 fn ray_sphere_behind() {
-    let r = Ray::new(
-        Tuple::new_point(0., 0., 5.),
-        Tuple::new_vector(0., 0., 1.)
-    ).unwrap();
+    let r = Ray::new(Tuple::new_point(0., 0., 5.), Tuple::new_vector(0., 0., 1.)).unwrap();
 
     let s = Sphere::new();
 
@@ -110,10 +91,7 @@ fn ray_sphere_behind() {
 
 #[test]
 fn intersection_has_t_and_object() {
-    let r = Ray::new(
-        Tuple::new_point(0., 0., 5.),
-        Tuple::new_vector(0., 0., 1.)
-    ).unwrap();
+    let r = Ray::new(Tuple::new_point(0., 0., 5.), Tuple::new_vector(0., 0., 1.)).unwrap();
 
     let s = Sphere::new();
 
@@ -137,10 +115,7 @@ fn intersection_has_t_and_object() {
 
 #[test]
 fn intersect_sets_object_on_intersection() {
-    let r = Ray::new(
-        Tuple::new_point(0., 0., -5.),
-        Tuple::new_vector(0., 0., 1.)
-    ).unwrap();
+    let r = Ray::new(Tuple::new_point(0., 0., -5.), Tuple::new_vector(0., 0., 1.)).unwrap();
 
     let s = Sphere::new();
 
@@ -171,7 +146,6 @@ fn hit_some_negative() {
     assert_eq!(i, Some(&i2));
 }
 
-
 #[test]
 fn hit_all_negative() {
     let s = Sphere::new();
@@ -196,10 +170,7 @@ fn hit_lowest_non_negative() {
 
 #[test]
 fn ray_translation() {
-    let r = Ray::new(
-        Tuple::new_point(1., 2., 3.),
-        Tuple::new_vector(0., 1., 0.)
-    ).unwrap();
+    let r = Ray::new(Tuple::new_point(1., 2., 3.), Tuple::new_vector(0., 1., 0.)).unwrap();
 
     let m = Matrix4::new_translation(3., 4., 5.);
 
@@ -211,10 +182,7 @@ fn ray_translation() {
 
 #[test]
 fn ray_scaling() {
-    let r = Ray::new(
-        Tuple::new_point(1., 2., 3.),
-        Tuple::new_vector(0., 1., 0.)
-    ).unwrap();
+    let r = Ray::new(Tuple::new_point(1., 2., 3.), Tuple::new_vector(0., 1., 0.)).unwrap();
 
     let m = Matrix4::new_scaling(2., 3., 4.);
 
@@ -226,10 +194,7 @@ fn ray_scaling() {
 
 #[test]
 fn scaled_sphere_intersect() {
-    let r = Ray::new(
-        Tuple::new_point(0., 0., -5.),
-        Tuple::new_vector(0., 0., 1.)
-    ).unwrap();
+    let r = Ray::new(Tuple::new_point(0., 0., -5.), Tuple::new_vector(0., 0., 1.)).unwrap();
 
     let s = Sphere::new_with_transform(Matrix4::new_scaling(2., 2., 2.));
 
@@ -242,10 +207,7 @@ fn scaled_sphere_intersect() {
 
 #[test]
 fn translated_sphere_intersect() {
-    let r = Ray::new(
-        Tuple::new_point(0., 0., -5.),
-        Tuple::new_vector(0., 0., 1.)
-    ).unwrap();
+    let r = Ray::new(Tuple::new_point(0., 0., -5.), Tuple::new_vector(0., 0., 1.)).unwrap();
 
     let s = Sphere::new_with_transform(Matrix4::new_translation(5., 0., 0.));
 

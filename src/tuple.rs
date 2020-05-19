@@ -1,6 +1,6 @@
 const EPSILON: f64 = 0.00001;
 
-use std::ops::{Add, Sub, Neg, Mul, Div };
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
 pub fn is_equal(a: f64, b: f64) -> bool {
     (a - b).abs() < EPSILON
@@ -10,7 +10,7 @@ pub fn is_equal(a: f64, b: f64) -> bool {
 pub enum TupleType {
     Point,
     Vector,
-    Other
+    Other,
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -24,11 +24,21 @@ pub struct Tuple {
 #[allow(dead_code)]
 impl Tuple {
     pub fn new_point(x: f64, y: f64, z: f64) -> Self {
-        Self{x: x, y: y, z: z, w: 1.0}
+        Self {
+            x: x,
+            y: y,
+            z: z,
+            w: 1.0,
+        }
     }
 
     pub fn new_vector(x: f64, y: f64, z: f64) -> Self {
-        Self{x: x, y: y, z: z, w: 0.0}
+        Self {
+            x: x,
+            y: y,
+            z: z,
+            w: 0.0,
+        }
     }
 
     pub fn is_point(&self) -> bool {
@@ -68,7 +78,7 @@ impl Tuple {
             x: self.y * other.z - self.z * other.y,
             y: self.z * other.x - self.x * other.z,
             z: self.x * other.y - self.y * other.x,
-            w: 0.0
+            w: 0.0,
         }
     }
 
@@ -79,8 +89,12 @@ impl Tuple {
             x: self.x / mag,
             y: self.y / mag,
             z: self.z / mag,
-            w: self.w / mag
+            w: self.w / mag,
         }
+    }
+
+    pub fn reflect(&self, normal: Tuple) -> Self {
+        *self - normal * 2.0 * self.dot(&normal)
     }
 }
 
@@ -92,7 +106,7 @@ impl Add for Tuple {
             x: self.x + other.x,
             y: self.y + other.y,
             z: self.z + other.z,
-            w: self.w + other.w
+            w: self.w + other.w,
         }
     }
 }
@@ -105,7 +119,7 @@ impl Sub for Tuple {
             x: self.x - other.x,
             y: self.y - other.y,
             z: self.z - other.z,
-            w: self.w - other.w
+            w: self.w - other.w,
         }
     }
 }
@@ -118,7 +132,7 @@ impl Neg for Tuple {
             x: -self.x,
             y: -self.y,
             z: -self.z,
-            w: -self.w
+            w: -self.w,
         }
     }
 }
@@ -131,7 +145,7 @@ impl Mul<f64> for Tuple {
             x: self.x * scalar,
             y: self.y * scalar,
             z: self.z * scalar,
-            w: self.w * scalar
+            w: self.w * scalar,
         }
     }
 }
@@ -144,7 +158,7 @@ impl Div<f64> for Tuple {
             x: self.x / scalar,
             y: self.y / scalar,
             z: self.z / scalar,
-            w: self.w / scalar
+            w: self.w / scalar,
         }
     }
 }
@@ -152,9 +166,9 @@ impl Div<f64> for Tuple {
 impl PartialEq for Tuple {
     fn eq(&self, other: &Self) -> bool {
         (is_equal(self.x, other.x)
-         && is_equal(self.y, other.y)
-         && is_equal(self.z, other.z)
-         && is_equal(self.w, other.w))
+            && is_equal(self.y, other.y)
+            && is_equal(self.z, other.z)
+            && is_equal(self.w, other.w))
     }
 }
 

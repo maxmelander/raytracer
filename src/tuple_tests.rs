@@ -23,7 +23,7 @@ fn create_vector() -> Result<(), String> {
 }
 
 #[test]
-fn is_equal(){
+fn is_equal() {
     let a = Tuple::new_point(1.0, 2.0, -3.0);
     let b = Tuple::new_point(1.0000001, 2.0, -3.0);
     assert!(a == b);
@@ -120,7 +120,14 @@ fn normalize() {
     let b = Tuple::new_vector(1.0, 2.0, 3.0);
 
     assert_eq!(a.normalize(), Tuple::new_vector(1.0, 0.0, 0.0));
-    assert_eq!(b.normalize(), Tuple::new_vector(1.0 / 14.0_f64.sqrt(), 2.0 / 14.0_f64.sqrt(), 3.0 / 14.0_f64.sqrt()));
+    assert_eq!(
+        b.normalize(),
+        Tuple::new_vector(
+            1.0 / 14.0_f64.sqrt(),
+            2.0 / 14.0_f64.sqrt(),
+            3.0 / 14.0_f64.sqrt()
+        )
+    );
     assert_eq!(b.normalize().magnitude(), 1.0);
 }
 
@@ -139,4 +146,20 @@ fn cross_product() {
     assert_eq!(b.cross(&a), Tuple::new_vector(1.0, -2.0, 1.0));
 }
 
+#[test]
+fn reflect_45_deg() {
+    let v = Tuple::new_vector(1., -1., 0.);
+    let n = Tuple::new_vector(0., 1., 0.);
 
+    let r = v.reflect(n);
+    assert_eq!(r, Tuple::new_vector(1., 1., 0.));
+}
+
+#[test]
+fn reflect_slanted_surface() {
+    let v = Tuple::new_vector(0., -1., 0.);
+    let n = Tuple::new_vector(2_f64.sqrt() / 2., 2_f64.sqrt() / 2., 0.);
+
+    let r = v.reflect(n);
+    assert_eq!(r, Tuple::new_vector(1., 0., 0.));
+}
