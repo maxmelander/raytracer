@@ -22,4 +22,19 @@ impl Sphere {
     pub fn set_transform(&mut self, matrix: Matrix4) {
         self.transform = matrix;
     }
+
+    // NOTE: The way I have set up vectors and points to have a shared type is not optimal
+    // there is no way right now for me to specify that his function should take a point, not vector
+    pub fn normal_at(&self, world_point: Tuple) -> Option<Tuple> {
+        if world_point.is_vector() {
+            None
+        } else {
+            let object_point = self.transform.inverse()? * world_point;
+            let object_normal = object_point - Tuple::new_point(0., 0., 0.);
+            let mut world_normal = self.transform.inverse()?.transpose() * object_normal;
+            world_normal.w = 0.0;
+
+            Some(world_normal.normalize())
+        }
+    }
 }

@@ -58,8 +58,8 @@ fn draw_clock() {
     fs::write("/Users/maxmelander/Development/test.ppm", ppm).expect("Unable to write file");
 }
 
-fn main() {
-    // Scene setup
+fn draw_sphere() {
+     // Scene setup
     let ray_origin = Tuple::new_point(0., 0., -5.);
     let wall_z = 10.;
     let wall_size = 7.;
@@ -97,4 +97,8 @@ fn main() {
     }
     let ppm = canvas.to_ppm();
     fs::write("/home/maxmelander/test.ppm", ppm).expect("Unable to write file");
+}
+
+fn main() {
+    draw_sphere();
 }
