@@ -1,21 +1,24 @@
 use super::tuple::Tuple;
 use super::matrix::Matrix4;
+use super::material::Material;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Sphere {
     pub origin: Tuple,
-    pub transform: Matrix4
-
+    pub transform: Matrix4,
+    pub material: Material,
 }
 
 #[allow(dead_code)]
 impl Sphere {
     pub fn new() -> Self {
-        Self{origin: Tuple::new_point(0., 0., 0.), transform: Matrix4::new_identity()}
+        let material: Material = Default::default();
+        Self{origin: Tuple::new_point(0., 0., 0.), transform: Matrix4::new_identity(), material}
     }
 
     pub fn new_with_transform(transform: Matrix4) -> Self {
-        Self{origin: Tuple::new_point(0., 0., 0.), transform}
+        let material: Material = Default::default();
+        Self{origin: Tuple::new_point(0., 0., 0.), transform, material}
     }
 
     // NOTE: Should this mutate the struct, or just return a new copy?

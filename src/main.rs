@@ -18,6 +18,15 @@ mod sphere_tests;
 
 mod intersection;
 
+mod point_light;
+mod point_light_tests;
+
+mod material;
+mod material_tests;
+
+mod utils;
+mod utils_tests;
+
 use std::f64::consts::PI;
 
 use crate::tuple::Tuple;
@@ -27,6 +36,9 @@ use crate::matrix::Matrix4;
 use crate::sphere::Sphere;
 use crate::ray::Ray;
 use crate::intersection::*;
+use crate::material::Material;
+use crate::point_light::PointLight;
+use crate::utils::lighting;
 
 use std::fs;
 
@@ -63,16 +75,24 @@ fn draw_sphere() {
     let ray_origin = Tuple::new_point(0., 0., -5.);
     let wall_z = 10.;
     let wall_size = 7.;
-    let canvas_pixels = 100.;
+    let canvas_pixels = 300.;
     let pixel_size = wall_size / canvas_pixels;
     let half = wall_size / 2.;
     let mut sphere = Sphere::new();
-    sphere.set_transform(Matrix4::new_scaling(1., 0.5, 1.));
+    sphere.material = Material{
+        color: Color::new(1., 0.2, 1.),
+        ..Default::default()
+    };
+
+    let light = PointLight::new(
+        Tuple::new_point(12., 10., -10.),
+        Color::new(0.3, 0.3, 1.0)
+    ).unwrap();
+
+    //sphere.set_transform(Matrix4::new_scaling(1.0, 0.9, 1.));
 
     // Canvas setup
     let mut canvas = Canvas::new(canvas_pixels as usize, canvas_pixels as usize);
-    let color = Color::new(1., 0., 1.);
-
 
     // For each coordinate in our "screen", shoot a ray from the ray origin,
     // through the sphere and to the screen coordinate. If there was a hit,
@@ -85,11 +105,13 @@ fn draw_sphere() {
 
             let position = Tuple::new_point(world_x, world_y, wall_z);
             let r = Ray::new(ray_origin, (position - ray_origin).normalize()).unwrap();
-
             let xs = r.intersect(sphere);
-
             if let Some(intersections) = xs {
-                if hit(&intersections).is_some() {
+                if let Some(hit) = hit(&intersections) {
+                    let point = r.position(hit.t);
+                    let normal = hit.object.normal_at(point).unwrap();
+                    let eye = -r.direction;
+                    let color = lighting(hit.object.material, point, light, eye, normal).unwrap();
                     let _ = canvas.write_pixel(x, y, color);
                 }
             }

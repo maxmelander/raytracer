@@ -1,7 +1,7 @@
+#[cfg(test)]
 use super::intersection::*;
 use super::matrix::*;
 use super::ray::*;
-#[cfg(test)]
 use super::sphere::*;
 use super::tuple::*;
 

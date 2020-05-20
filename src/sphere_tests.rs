@@ -2,6 +2,7 @@
 use super::sphere::*;
 use super::matrix::*;
 use super::tuple::Tuple;
+use super::material::Material;
 
 #[test]
 fn sphere_default_transform() {
@@ -66,4 +67,20 @@ fn normal_transformed_sphere() {
     let s = Sphere::new_with_transform(m);
     let n = s.normal_at(Tuple::new_point(0., 2_f64.sqrt() / 2., -2_f64.sqrt() / 2.)).unwrap();
     assert_eq!(n, Tuple::new_vector(0., 0.97014, -0.24254));
+}
+
+#[test]
+fn sphere_has_default_material() {
+    let s = Sphere::new();
+    let m: Material = Default::default();
+    assert_eq!(s.material, m);
+}
+
+#[test]
+fn sphere_may_be_assigned_material() {
+    let mut s = Sphere::new();
+    let mut m: Material = Default::default();
+    m.ambient = 1.0;
+    s.material = m;
+    assert_eq!(s.material, m);
 }
