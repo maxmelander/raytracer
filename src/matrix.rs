@@ -1,7 +1,7 @@
 const EPSILON: f64 = 0.00001;
 
-use std::ops::{Mul, Div, Index, IndexMut};
 use super::tuple::Tuple;
+use std::ops::{Div, Index, IndexMut, Mul};
 
 pub fn is_equal(a: f64, b: f64) -> bool {
     (a - b).abs() < EPSILON
@@ -9,107 +9,146 @@ pub fn is_equal(a: f64, b: f64) -> bool {
 
 #[derive(Debug, Copy, Clone)]
 pub struct Matrix4 {
-    data: [[f64; 4]; 4]
+    data: [[f64; 4]; 4],
 }
 
 #[derive(Debug, Copy, Clone)]
 pub struct Matrix3 {
-    data: [[f64; 3]; 3]
+    data: [[f64; 3]; 3],
 }
 
 #[derive(Debug, Copy, Clone)]
 pub struct Matrix2 {
-    data: [[f64; 2]; 2]
+    data: [[f64; 2]; 2],
 }
 
 #[allow(dead_code)]
 impl Matrix4 {
     pub fn new(data: Option<[[f64; 4]; 4]>) -> Self {
         match data {
-            Some(data) => Self{data: data},
-            None => Self{data: [[0.0; 4]; 4]}
+            Some(data) => Self { data: data },
+            None => Self {
+                data: [[0.0; 4]; 4],
+            },
         }
     }
 
     pub fn new_translation(x: f64, y: f64, z: f64) -> Self {
-        Self{data: [
-            [1., 0., 0., x],
-            [0., 1., 0., y],
-            [0., 0., 1., z],
-            [0., 0., 0., 1.],
-        ]}
+        Self {
+            data: [
+                [1., 0., 0., x],
+                [0., 1., 0., y],
+                [0., 0., 1., z],
+                [0., 0., 0., 1.],
+            ],
+        }
     }
 
     pub fn new_scaling(x: f64, y: f64, z: f64) -> Self {
-        Self{data: [
-            [x, 0., 0., 0.],
-            [0., y, 0., 0.],
-            [0., 0., z, 0.],
-            [0., 0., 0., 1.],
-        ]}
+        Self {
+            data: [
+                [x, 0., 0., 0.],
+                [0., y, 0., 0.],
+                [0., 0., z, 0.],
+                [0., 0., 0., 1.],
+            ],
+        }
     }
 
     pub fn new_shearing(xy: f64, xz: f64, yx: f64, yz: f64, zx: f64, zy: f64) -> Self {
-        Self{data: [
-            [1., xy, xz, 0.],
-            [yx, 1., yz, 0.],
-            [zx, zy, 1., 0.],
-            [0., 0., 0., 1.],
-        ]}
+        Self {
+            data: [
+                [1., xy, xz, 0.],
+                [yx, 1., yz, 0.],
+                [zx, zy, 1., 0.],
+                [0., 0., 0., 1.],
+            ],
+        }
     }
 
     pub fn new_rotation_x(r: f64) -> Self {
-        Self{data: [
-            [1., 0., 0., 0.],
-            [0., r.cos(), -r.sin(), 0.],
-            [0., r.sin(), r.cos(), 0.],
-            [0., 0., 0., 1.],
-        ]}
+        Self {
+            data: [
+                [1., 0., 0., 0.],
+                [0., r.cos(), -r.sin(), 0.],
+                [0., r.sin(), r.cos(), 0.],
+                [0., 0., 0., 1.],
+            ],
+        }
     }
 
     pub fn new_rotation_y(r: f64) -> Self {
-        Self{data: [
-            [r.cos(), 0., r.sin(), 0.],
-            [0., 1., 0., 0.],
-            [-r.sin(), 0., r.cos(), 0.],
-            [0., 0., 0., 1.],
-        ]}
+        Self {
+            data: [
+                [r.cos(), 0., r.sin(), 0.],
+                [0., 1., 0., 0.],
+                [-r.sin(), 0., r.cos(), 0.],
+                [0., 0., 0., 1.],
+            ],
+        }
     }
 
     pub fn new_rotation_z(r: f64) -> Self {
-        Self{data: [
-            [r.cos(), -r.sin(), 0., 0.],
-            [r.sin(), r.cos(), 0., 0.],
-            [0., 0., 1., 0.],
-            [0., 0., 0., 1.],
-        ]}
+        Self {
+            data: [
+                [r.cos(), -r.sin(), 0., 0.],
+                [r.sin(), r.cos(), 0., 0.],
+                [0., 0., 1., 0.],
+                [0., 0., 0., 1.],
+            ],
+        }
     }
 
     pub fn new_identity() -> Self {
-        Self{data: [
-            [1., 0., 0., 0.],
-            [0., 1., 0., 0.],
-            [0., 0., 1., 0.],
-            [0., 0., 0., 1.]
-        ]}
+        Self {
+            data: [
+                [1., 0., 0., 0.],
+                [0., 1., 0., 0.],
+                [0., 0., 1., 0.],
+                [0., 0., 0., 1.],
+            ],
+        }
+    }
+
+    pub fn new_view_transform(from: Tuple, to: Tuple, up: Tuple) -> Self {
+        let forward = (to - from).normalize();
+        let left = forward.cross(&up.normalize());
+        let true_up = left.cross(&forward);
+
+        let orientation = Matrix4 {
+            data: [
+                [left.x, left.y, left.z, 0.],
+                [true_up.x, true_up.y, true_up.z, 0.],
+                [-forward.x, -forward.y, -forward.z, 0.],
+                [0., 0., 0., 1.],
+            ],
+        };
+
+        orientation * Matrix4::new_translation(-from.x, -from.y, -from.z)
     }
 
     pub fn transpose(self) -> Self {
-        Self{data: [
-            [self[0][0], self[1][0], self[2][0], self[3][0]],
-            [self[0][1], self[1][1], self[2][1], self[3][1]],
-            [self[0][2], self[1][2], self[2][2], self[3][2]],
-            [self[0][3], self[1][3], self[2][3], self[3][3]],
-        ]}
+        Self {
+            data: [
+                [self[0][0], self[1][0], self[2][0], self[3][0]],
+                [self[0][1], self[1][1], self[2][1], self[3][1]],
+                [self[0][2], self[1][2], self[2][2], self[3][2]],
+                [self[0][3], self[1][3], self[2][3], self[3][3]],
+            ],
+        }
     }
 
     pub fn submatrix(&self, row: usize, col: usize) -> Matrix3 {
         let mut values = [0.0; 9];
         let mut index = 0;
         for r in 0..4 {
-            if r == row {continue;}
+            if r == row {
+                continue;
+            }
             for c in 0..4 {
-                if c == col {continue;}
+                if c == col {
+                    continue;
+                }
                 values[index] = self[r][c];
                 index += 1;
             }
@@ -143,17 +182,39 @@ impl Matrix4 {
         result
     }
 
-    pub fn inverse(&self) -> Option<Self>{
+    pub fn inverse(&self) -> Option<Self> {
         let determinant = self.determinant();
         if determinant == 0.0 {
             None
         } else {
-            Some(Matrix4::new(Some([
-                [self.cofactor(0,0), self.cofactor(1,0), self.cofactor(2,0), self.cofactor(3,0)],
-                [self.cofactor(0,1), self.cofactor(1,1), self.cofactor(2,1), self.cofactor(3,1)],
-                [self.cofactor(0,2), self.cofactor(1,2), self.cofactor(2,2), self.cofactor(3,2)],
-                [self.cofactor(0,3), self.cofactor(1,3), self.cofactor(2,3), self.cofactor(3,3)],
-            ])) / determinant)
+            Some(
+                Matrix4::new(Some([
+                    [
+                        self.cofactor(0, 0),
+                        self.cofactor(1, 0),
+                        self.cofactor(2, 0),
+                        self.cofactor(3, 0),
+                    ],
+                    [
+                        self.cofactor(0, 1),
+                        self.cofactor(1, 1),
+                        self.cofactor(2, 1),
+                        self.cofactor(3, 1),
+                    ],
+                    [
+                        self.cofactor(0, 2),
+                        self.cofactor(1, 2),
+                        self.cofactor(2, 2),
+                        self.cofactor(3, 2),
+                    ],
+                    [
+                        self.cofactor(0, 3),
+                        self.cofactor(1, 3),
+                        self.cofactor(2, 3),
+                        self.cofactor(3, 3),
+                    ],
+                ])) / determinant,
+            )
         }
     }
 }
@@ -162,8 +223,10 @@ impl Matrix4 {
 impl Matrix3 {
     pub fn new(data: Option<[[f64; 3]; 3]>) -> Self {
         match data {
-            Some(data) => Self{data: data},
-            None => Self{data: [[0.0; 3]; 3]}
+            Some(data) => Self { data: data },
+            None => Self {
+                data: [[0.0; 3]; 3],
+            },
         }
     }
 
@@ -172,18 +235,19 @@ impl Matrix3 {
         let mut values = [0.0; 4];
         let mut index = 0;
         for r in 0..3 {
-            if r == row {continue;}
+            if r == row {
+                continue;
+            }
             for c in 0..3 {
-                if c == col {continue;}
+                if c == col {
+                    continue;
+                }
                 values[index] = self[r][c];
                 index += 1;
             }
         }
 
-        Matrix2::new(Some([
-            [values[0], values[1]],
-            [values[2], values[3]],
-        ]))
+        Matrix2::new(Some([[values[0], values[1]], [values[2], values[3]]]))
     }
 
     pub fn minor(&self, row: usize, col: usize) -> f64 {
@@ -212,8 +276,10 @@ impl Matrix3 {
 impl Matrix2 {
     pub fn new(data: Option<[[f64; 2]; 2]>) -> Self {
         match data {
-            Some(data) => Self{data: data},
-            None => Self{data: [[0.0; 2]; 2]}
+            Some(data) => Self { data: data },
+            None => Self {
+                data: [[0.0; 2]; 2],
+            },
         }
     }
 
@@ -267,17 +333,15 @@ impl IndexMut<usize> for Matrix2 {
 impl Mul for Matrix4 {
     type Output = Self;
 
-
     fn mul(self, other: Self) -> Self {
         let mut result = Self::new(None);
 
         for row in 0..4 {
             for col in 0..4 {
-                result[row][col] =
-                    (self[row][0] * other[0][col]) +
-                    (self[row][1] * other[1][col]) +
-                    (self[row][2] * other[2][col]) +
-                    (self[row][3] * other[3][col]);
+                result[row][col] = (self[row][0] * other[0][col])
+                    + (self[row][1] * other[1][col])
+                    + (self[row][2] * other[2][col])
+                    + (self[row][3] * other[3][col]);
             }
         }
         result
@@ -290,18 +354,17 @@ impl Mul<Tuple> for Matrix4 {
     fn mul(self, other: Tuple) -> Tuple {
         let mut result = Tuple::new_point(0.0, 0.0, 0.0);
         for row in 0..4 {
-            let value = 
-                (self[row][0] * other.x) +
-                (self[row][1] * other.y) +
-                (self[row][2] * other.z) +
-                (self[row][3] * other.w);
+            let value = (self[row][0] * other.x)
+                + (self[row][1] * other.y)
+                + (self[row][2] * other.z)
+                + (self[row][3] * other.w);
 
             match row {
                 0 => result.x = value,
                 1 => result.y = value,
                 2 => result.z = value,
                 3 => result.w = value,
-                _ => ()
+                _ => (),
             }
         }
         result
@@ -313,10 +376,30 @@ impl Div<f64> for Matrix4 {
 
     fn div(self, other: f64) -> Self {
         Self::new(Some([
-            [self[0][0] / other, self[0][1] / other, self[0][2] / other, self[0][3] / other, ],
-            [self[1][0] / other, self[1][1] / other, self[1][2] / other, self[1][3] / other, ],
-            [self[2][0] / other, self[2][1] / other, self[2][2] / other, self[2][3] / other, ],
-            [self[3][0] / other, self[3][1] / other, self[3][2] / other, self[3][3] / other, ],
+            [
+                self[0][0] / other,
+                self[0][1] / other,
+                self[0][2] / other,
+                self[0][3] / other,
+            ],
+            [
+                self[1][0] / other,
+                self[1][1] / other,
+                self[1][2] / other,
+                self[1][3] / other,
+            ],
+            [
+                self[2][0] / other,
+                self[2][1] / other,
+                self[2][2] / other,
+                self[2][3] / other,
+            ],
+            [
+                self[3][0] / other,
+                self[3][1] / other,
+                self[3][2] / other,
+                self[3][3] / other,
+            ],
         ]))
     }
 }

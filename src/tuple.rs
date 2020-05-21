@@ -73,6 +73,8 @@ impl Tuple {
         (self.x * other.x) + (self.y * other.y) + (self.z * other.z) + (self.w * other.w)
     }
 
+    // NOTE: Think about why we would want to pass by reference here,
+    // and not by value
     pub fn cross(&self, other: &Self) -> Self {
         Self {
             x: self.y * other.z - self.z * other.y,

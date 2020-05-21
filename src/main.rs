@@ -30,21 +30,23 @@ mod utils_tests;
 mod world;
 mod world_tests;
 
+mod camera;
+mod camera_tests;
+
 use std::f64::consts::PI;
 
-use crate::tuple::Tuple;
-use crate::color::Color;
 use crate::canvas::Canvas;
-use crate::matrix::Matrix4;
-use crate::sphere::Sphere;
-use crate::ray::Ray;
+use crate::color::Color;
 use crate::intersection::*;
 use crate::material::Material;
+use crate::matrix::Matrix4;
 use crate::point_light::PointLight;
+use crate::ray::Ray;
+use crate::sphere::Sphere;
+use crate::tuple::Tuple;
 use crate::utils::lighting;
 
 use std::fs;
-
 
 fn draw_clock() {
     let width = 500;
@@ -58,7 +60,8 @@ fn draw_clock() {
     let _ = canvas.write_pixel(
         (p.x + (width as f64 / 2.)) as usize,
         (p.y + (height as f64 / 2.)) as usize,
-        Color::new(1., 0., 1.));
+        Color::new(1., 0., 1.),
+    );
 
     for _ in 1..12 {
         p = rotation * p;
@@ -66,7 +69,8 @@ fn draw_clock() {
         let _ = canvas.write_pixel(
             (p.x + (width as f64 / 2.)) as usize,
             (p.y + (height as f64 / 2.)) as usize,
-            Color::new(1., 0., 1.));
+            Color::new(1., 0., 1.),
+        );
     }
 
     let ppm = canvas.to_ppm();
@@ -74,7 +78,7 @@ fn draw_clock() {
 }
 
 fn draw_sphere() {
-     // Scene setup
+    // Scene setup
     let ray_origin = Tuple::new_point(0., 0., -5.);
     let wall_z = 10.;
     let wall_size = 7.;
@@ -82,15 +86,13 @@ fn draw_sphere() {
     let pixel_size = wall_size / canvas_pixels;
     let half = wall_size / 2.;
     let mut sphere = Sphere::new();
-    sphere.material = Material{
+    sphere.material = Material {
         color: Color::new(1., 0.2, 1.),
         ..Default::default()
     };
 
-    let light = PointLight::new(
-        Tuple::new_point(12., 10., -10.),
-        Color::new(0.3, 0.3, 1.0)
-    ).unwrap();
+    let light =
+        PointLight::new(Tuple::new_point(12., 10., -10.), Color::new(0.3, 0.3, 1.0)).unwrap();
 
     //sphere.set_transform(Matrix4::new_scaling(1.0, 0.9, 1.));
 
