@@ -2,6 +2,7 @@ use super::tuple::Tuple;
 use super::sphere::Sphere;
 use super::intersection::Intersection;
 use super::matrix::Matrix4;
+use super::world::World;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Ray {
@@ -36,6 +37,23 @@ impl Ray {
         let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
         let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
         Some([Intersection::new(t1, sphere), Intersection::new(t2, sphere)])
+    }
+
+    // NOTE(Optimization); Is it faster to have a fixed size array here, and just not fill it up
+    // if we don't get enough intersections?
+    // And then live with the fact that we have a limit to how many intersections we can find
+    pub fn intersect_world(&self, world: &World) -> Vec<Intersection> {
+        let mut xs: Vec<Intersection> = vec![];
+
+        let objects_iter = world.objects.iter();
+        for o in objects_iter {
+            if let Some(i) = self.intersect(*o) {
+                xs.extend_from_slice(&i);
+            }
+        }
+
+        xs.sort();
+        xs
     }
 
     pub fn transform(&self, matrix: Matrix4) -> Self {

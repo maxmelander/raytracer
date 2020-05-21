@@ -27,6 +27,9 @@ mod material_tests;
 mod utils;
 mod utils_tests;
 
+mod world;
+mod world_tests;
+
 use std::f64::consts::PI;
 
 use crate::tuple::Tuple;
@@ -75,7 +78,7 @@ fn draw_sphere() {
     let ray_origin = Tuple::new_point(0., 0., -5.);
     let wall_z = 10.;
     let wall_size = 7.;
-    let canvas_pixels = 300.;
+    let canvas_pixels = 800.;
     let pixel_size = wall_size / canvas_pixels;
     let half = wall_size / 2.;
     let mut sphere = Sphere::new();

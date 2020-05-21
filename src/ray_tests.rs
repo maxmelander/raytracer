@@ -4,6 +4,7 @@ use super::matrix::*;
 use super::ray::*;
 use super::sphere::*;
 use super::tuple::*;
+use super::world::World;
 
 #[test]
 fn create_ray() {
@@ -214,4 +215,70 @@ fn translated_sphere_intersect() {
     let xs = r.intersect(s);
 
     assert_eq!(xs, None);
+}
+
+#[test]
+fn intersect_world() {
+    let w: World = Default::default();
+    let r = Ray::new(Tuple::new_point(0., 0., -5.), Tuple::new_vector(0., 0., 1.)).unwrap();
+
+    let xs = r.intersect_world(&w);
+
+    assert_eq!(xs.len(), 4);
+    assert_eq!(xs[0].t, 4.);
+    assert_eq!(xs[1].t, 4.5);
+    assert_eq!(xs[2].t, 5.5);
+    assert_eq!(xs[3].t, 6.);
+}
+
+#[test]
+fn precompute_intersection_state() {
+    let r = Ray::new(Tuple::new_point(0., 0., -5.), Tuple::new_vector(0., 0., 1.)).unwrap();
+    let shape = Sphere::new();
+    let i = Intersection{
+        t: 4.0,
+        object: shape
+    };
+
+    let comps = i.prepare_computations(r).unwrap();
+
+    assert_eq!(comps.t, i.t);
+    assert_eq!(comps.object, i.object);
+    assert_eq!(comps.point, Tuple::new_point(0., 0., -1.));
+    assert_eq!(comps.eye_v, Tuple::new_vector(0., 0., -1.));
+    assert_eq!(comps.normal_v, Tuple::new_vector(0., 0., -1.));
+}
+
+#[test]
+fn precompue_hit_intersection_outside() {
+    let r = Ray::new(Tuple::new_point(0., 0., -5.), Tuple::new_vector(0., 0., 1.)).unwrap();
+    let shape = Sphere::new();
+
+    let i = Intersection{
+        t: 4.0,
+        object: shape
+    };
+
+    let comps = i.prepare_computations(r).unwrap();
+
+    assert_eq!(comps.inside, false);
+}
+
+#[test]
+fn precompue_hit_intersection_inside() {
+    let r = Ray::new(Tuple::new_point(0., 0., 0.), Tuple::new_vector(0., 0., 1.)).unwrap();
+    let shape = Sphere::new();
+
+    let i = Intersection{
+        t: 1.0,
+        object: shape
+    };
+
+    let comps = i.prepare_computations(r).unwrap();
+    assert_eq!(comps.t, i.t);
+    assert_eq!(comps.object, i.object);
+    assert_eq!(comps.point, Tuple::new_point(0., 0., 1.));
+    assert_eq!(comps.eye_v, Tuple::new_vector(0., 0., -1.));
+    assert_eq!(comps.normal_v, Tuple::new_vector(0., 0., -1.));
+    assert_eq!(comps.inside, true);
 }
