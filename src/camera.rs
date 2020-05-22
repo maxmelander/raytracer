@@ -11,21 +11,17 @@ pub struct Camera {
     pub transform: Matrix4,
 }
 
+#[allow(dead_code)]
 impl Camera {
     pub fn new(h_size: usize, v_size: usize, field_of_view: f64) -> Self {
         let half_view = (field_of_view / 2.0).tan();
         let aspect = (h_size as f64) / (v_size as f64);
 
-        let mut half_width = 0.;
-        let mut half_height = 0.;
-
-        if aspect >= 1 {
-            half_width = half_view;
-            half_height = half_view / aspect;
+        let (half_width, half_height) = if aspect >= 1. {
+            (half_view, half_view / aspect)
         } else {
-            half_width = half_view * aspect;
-            half_height = half_view;
-        }
+            (half_view * aspect, half_view)
+        };
 
         let pixel_size = (half_width * 2.) / h_size as f64;
 

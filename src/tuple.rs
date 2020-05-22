@@ -41,21 +41,21 @@ impl Tuple {
         }
     }
 
-    pub fn is_point(&self) -> bool {
+    pub fn is_point(self) -> bool {
         if let TupleType::Point = self.get_type() {
             return true;
         }
         false
     }
 
-    pub fn is_vector(&self) -> bool {
+    pub fn is_vector(self) -> bool {
         if let TupleType::Vector = self.get_type() {
             return true;
         }
         false
     }
 
-    pub fn get_type(&self) -> TupleType {
+    pub fn get_type(self) -> TupleType {
         if (self.w - 0.0).abs() < EPSILON {
             TupleType::Vector
         } else if (self.w - 1.0).abs() < EPSILON {
@@ -65,17 +65,17 @@ impl Tuple {
         }
     }
 
-    pub fn magnitude(&self) -> f64 {
+    pub fn magnitude(self) -> f64 {
         (self.x.powi(2) + self.y.powi(2) + self.z.powi(2) + self.w.powi(2)).sqrt()
     }
 
-    pub fn dot(&self, other: &Self) -> f64 {
+    pub fn dot(self, other: Self) -> f64 {
         (self.x * other.x) + (self.y * other.y) + (self.z * other.z) + (self.w * other.w)
     }
 
     // NOTE: Think about why we would want to pass by reference here,
     // and not by value
-    pub fn cross(&self, other: &Self) -> Self {
+    pub fn cross(self, other: Self) -> Self {
         Self {
             x: self.y * other.z - self.z * other.y,
             y: self.z * other.x - self.x * other.z,
@@ -85,7 +85,7 @@ impl Tuple {
     }
 
     //TODO: Is it better to mutate self then to return a new Tuple?
-    pub fn normalize(&self) -> Self {
+    pub fn normalize(self) -> Self {
         let mag = self.magnitude();
         Self {
             x: self.x / mag,
@@ -95,8 +95,8 @@ impl Tuple {
         }
     }
 
-    pub fn reflect(&self, normal: Tuple) -> Self {
-        *self - normal * 2.0 * self.dot(&normal)
+    pub fn reflect(self, normal: Tuple) -> Self {
+        self - normal * 2.0 * self.dot(normal)
     }
 }
 

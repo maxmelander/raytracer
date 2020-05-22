@@ -123,7 +123,7 @@ fn draw_sphere() {
         }
     }
     let ppm = canvas.to_ppm();
-    fs::write("/home/maxmelander/test.ppm", ppm).expect("Unable to write file");
+    fs::write("/Users/maxm/Development/test.ppm", ppm).expect("Unable to write file");
 }
 
 fn main() {

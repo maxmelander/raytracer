@@ -112,8 +112,8 @@ impl Matrix4 {
 
     pub fn new_view_transform(from: Tuple, to: Tuple, up: Tuple) -> Self {
         let forward = (to - from).normalize();
-        let left = forward.cross(&up.normalize());
-        let true_up = left.cross(&forward);
+        let left = forward.cross(up.normalize());
+        let true_up = left.cross(forward);
 
         let orientation = Matrix4 {
             data: [
@@ -138,7 +138,7 @@ impl Matrix4 {
         }
     }
 
-    pub fn submatrix(&self, row: usize, col: usize) -> Matrix3 {
+    pub fn submatrix(self, row: usize, col: usize) -> Matrix3 {
         let mut values = [0.0; 9];
         let mut index = 0;
         for r in 0..4 {
@@ -161,12 +161,12 @@ impl Matrix4 {
         ]))
     }
 
-    pub fn minor(&self, row: usize, col: usize) -> f64 {
+    pub fn minor(self, row: usize, col: usize) -> f64 {
         let m3 = self.submatrix(row, col);
         m3.determinant()
     }
 
-    pub fn cofactor(&self, row: usize, col: usize) -> f64 {
+    pub fn cofactor(self, row: usize, col: usize) -> f64 {
         if (row + col).checked_rem(2) == Some(0) {
             self.minor(row, col)
         } else {
@@ -174,7 +174,7 @@ impl Matrix4 {
         }
     }
 
-    pub fn determinant(&self) -> f64 {
+    pub fn determinant(self) -> f64 {
         let mut result = 0.0;
         for c in 0..4 {
             result += self[0][c] * self.cofactor(0, c);
@@ -182,7 +182,7 @@ impl Matrix4 {
         result
     }
 
-    pub fn inverse(&self) -> Option<Self> {
+    pub fn inverse(self) -> Option<Self> {
         let determinant = self.determinant();
         if determinant == 0.0 {
             None
@@ -231,7 +231,7 @@ impl Matrix3 {
     }
 
     // TODO: There must be a nicer way of doing this
-    pub fn submatrix(&self, row: usize, col: usize) -> Matrix2 {
+    pub fn submatrix(self, row: usize, col: usize) -> Matrix2 {
         let mut values = [0.0; 4];
         let mut index = 0;
         for r in 0..3 {
@@ -250,12 +250,12 @@ impl Matrix3 {
         Matrix2::new(Some([[values[0], values[1]], [values[2], values[3]]]))
     }
 
-    pub fn minor(&self, row: usize, col: usize) -> f64 {
+    pub fn minor(self, row: usize, col: usize) -> f64 {
         let m2 = self.submatrix(row, col);
         m2.determinant()
     }
 
-    pub fn cofactor(&self, row: usize, col: usize) -> f64 {
+    pub fn cofactor(self, row: usize, col: usize) -> f64 {
         if (row + col).checked_rem(2) == Some(0) {
             self.minor(row, col)
         } else {
@@ -263,7 +263,7 @@ impl Matrix3 {
         }
     }
 
-    pub fn determinant(&self) -> f64 {
+    pub fn determinant(self) -> f64 {
         let mut result = 0.0;
         for c in 0..3 {
             result += self[0][c] * self.cofactor(0, c);
@@ -283,7 +283,7 @@ impl Matrix2 {
         }
     }
 
-    pub fn determinant(&self) -> f64 {
+    pub fn determinant(self) -> f64 {
         (self[0][0] * self[1][1]) - (self[0][1] * self[1][0])
     }
 }
