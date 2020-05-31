@@ -14,7 +14,7 @@ fn sphere_default_transform() {
 fn sphere_change_transform() {
     let mut s = Sphere::new();
     let t = Matrix4::new_translation(2., 3., 4.);
-    s.set_transform(t);
+    s.transform = t;
     assert_eq!(s.transform, t);
 }
 

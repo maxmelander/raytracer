@@ -29,11 +29,6 @@ impl Sphere {
         }
     }
 
-    // NOTE: Should this mutate the struct, or just return a new copy?
-    pub fn set_transform(mut self, matrix: Matrix4) {
-        self.transform = matrix;
-    }
-
     // NOTE: The way I have set up vectors and points to have a shared type is not optimal
     // there is no way right now for me to specify that his function should take a point, not vector
     pub fn normal_at(self, world_point: Tuple) -> Option<Tuple> {

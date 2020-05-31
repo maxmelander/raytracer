@@ -135,15 +135,15 @@ fn normalize() {
 fn dot_product() {
     let a = Tuple::new_vector(1.0, 2.0, 3.0);
     let b = Tuple::new_vector(2.0, 3.0, 4.0);
-    assert_eq!(a.dot(&b), 20.0);
+    assert_eq!(a.dot(b), 20.0);
 }
 
 #[test]
 fn cross_product() {
     let a = Tuple::new_vector(1.0, 2.0, 3.0);
     let b = Tuple::new_vector(2.0, 3.0, 4.0);
-    assert_eq!(a.cross(&b), Tuple::new_vector(-1.0, 2.0, -1.0));
-    assert_eq!(b.cross(&a), Tuple::new_vector(1.0, -2.0, 1.0));
+    assert_eq!(a.cross(b), Tuple::new_vector(-1.0, 2.0, -1.0));
+    assert_eq!(b.cross(a), Tuple::new_vector(1.0, -2.0, 1.0));
 }
 
 #[test]

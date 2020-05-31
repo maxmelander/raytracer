@@ -15,7 +15,7 @@ fn lighting_eye_between_light_and_surface() {
 
     let light = PointLight::new(Tuple::new_point(0., 0., -10.), Color::new(1., 1., 1.)).unwrap();
 
-    let result = lighting(m, position, light, eye_v, normal_v).unwrap();
+    let result = lighting(m, position, light, eye_v, normal_v, false).unwrap();
     assert_eq!(result, Color::new(1.9, 1.9, 1.9));
 }
 
@@ -29,7 +29,7 @@ fn lighting_eye_offset_45() {
 
     let light = PointLight::new(Tuple::new_point(0., 0., -10.), Color::new(1., 1., 1.)).unwrap();
 
-    let result = lighting(m, position, light, eye_v, normal_v).unwrap();
+    let result = lighting(m, position, light, eye_v, normal_v, false).unwrap();
     assert_eq!(result, Color::new(1.0, 1.0, 1.0));
 }
 
@@ -43,7 +43,7 @@ fn lighting_light_offset_45() {
 
     let light = PointLight::new(Tuple::new_point(0., 10., -10.), Color::new(1., 1., 1.)).unwrap();
 
-    let result = lighting(m, position, light, eye_v, normal_v).unwrap();
+    let result = lighting(m, position, light, eye_v, normal_v, false).unwrap();
     assert_eq!(result, Color::new(0.7364, 0.7364, 0.7364));
 }
 
@@ -57,7 +57,7 @@ fn lighting_eye_at_reflection() {
 
     let light = PointLight::new(Tuple::new_point(0., 10., -10.), Color::new(1., 1., 1.)).unwrap();
 
-    let result = lighting(m, position, light, eye_v, normal_v).unwrap();
+    let result = lighting(m, position, light, eye_v, normal_v, false).unwrap();
     assert_eq!(result, Color::new(1.6364, 1.6364, 1.6364));
 }
 
@@ -71,6 +71,21 @@ fn lighting_light_behind_surface() {
 
     let light = PointLight::new(Tuple::new_point(0., 0., 10.), Color::new(1., 1., 1.)).unwrap();
 
-    let result = lighting(m, position, light, eye_v, normal_v).unwrap();
+    let result = lighting(m, position, light, eye_v, normal_v, false).unwrap();
+    assert_eq!(result, Color::new(0.1, 0.1, 0.1));
+}
+
+#[test]
+fn lighting_with_suface_in_shadow() {
+    let m: Material = Default::default();
+    let position = Tuple::new_point(0., 0., 0.);
+
+    let eye_v = Tuple::new_vector(0., 0., -1.);
+    let normal_v = Tuple::new_vector(0., 0., -1.);
+
+    let light = PointLight::new(Tuple::new_point(0., 0., -10.), Color::new(1., 1., 1.)).unwrap();
+
+    let in_shadow = true;
+    let result = lighting(m, position, light, eye_v, normal_v, in_shadow).unwrap();
     assert_eq!(result, Color::new(0.1, 0.1, 0.1));
 }

@@ -21,7 +21,8 @@ impl World {
         let mut color = Color::new(0., 0., 0.);
 
         for light in self.lights.iter() {
-            if let Ok(result) = lighting(comps.object.material, comps.point, *light, comps.eye_v, comps.normal_v) {
+            let in_shadow = self.is_shadowed(comps.over_point, light);
+            if let Ok(result) = lighting(comps.object.material, comps.over_point, *light, comps.eye_v, comps.normal_v, in_shadow) {
                 color = color + result;
             }
         }
@@ -37,6 +38,21 @@ impl World {
             }
         }
         Color::new(0., 0., 0.)
+    }
+
+    pub fn is_shadowed(&self, point: Tuple, light: &PointLight) -> bool {
+        let v = light.position - point;
+        let distance = v.magnitude();
+        let direction = v.normalize();
+        if let Ok(shadow_ray) = Ray::new(point, direction) {
+            let xs = shadow_ray.intersect_world(&self);
+            if let Some(hit) = hit(&xs) {
+                if hit.t < distance {
+                    return true;
+                }
+            }
+        }
+        false
     }
 }
 

@@ -17,7 +17,7 @@ impl Canvas {
         &self.data
     }
 
-    pub fn write_pixel(&mut self, x: usize, y: usize, color: Color) -> Result<(), ()> {
+    pub fn write_pixel(&mut self, x: usize, y: usize, color: Color) -> Result<(), &'static str> {
 
         let width = self.get_width();
         let height = self.get_height();
@@ -26,7 +26,7 @@ impl Canvas {
             self.data[y][x] = color;
             Ok(())
         } else {
-            Err(())
+            Err("Tried to write to a pixel outside the canvas")
         }
     }
 

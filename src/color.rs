@@ -1,10 +1,5 @@
-const EPSILON: f64 = 0.00001;
-
 use std::ops::{Add, Div, Mul, Sub};
-
-fn is_equal(a: f64, b: f64) -> bool {
-    (a - b).abs() < EPSILON
-}
+use super::utils::is_equal;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Color {

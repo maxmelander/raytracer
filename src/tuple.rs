@@ -1,10 +1,5 @@
-const EPSILON: f64 = 0.00001;
-
 use std::ops::{Add, Div, Mul, Neg, Sub};
-
-pub fn is_equal(a: f64, b: f64) -> bool {
-    (a - b).abs() < EPSILON
-}
+use super::utils::{is_equal, EPSILON};
 
 #[derive(Debug)]
 pub enum TupleType {
@@ -24,12 +19,7 @@ pub struct Tuple {
 #[allow(dead_code)]
 impl Tuple {
     pub fn new_point(x: f64, y: f64, z: f64) -> Self {
-        Self {
-            x: x,
-            y: y,
-            z: z,
-            w: 1.0,
-        }
+        Self {x, y, z, w: 1.0}
     }
 
     pub fn new_vector(x: f64, y: f64, z: f64) -> Self {

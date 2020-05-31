@@ -1,14 +1,9 @@
 use std::cmp::Ordering;
 
+use super::utils::{is_equal, EPSILON};
 use super::ray::Ray;
 use super::sphere::Sphere;
 use super::tuple::Tuple;
-
-const EPSILON: f64 = 0.00001;
-
-pub fn is_equal(a: f64, b: f64) -> bool {
-    (a - b).abs() < EPSILON
-}
 
 pub fn float_compare(a: f64, b: f64) -> Ordering {
     if is_equal(a, b) {
@@ -25,6 +20,7 @@ pub struct Comps {
     pub t: f64,
     pub object: Sphere,
     pub point: Tuple,
+    pub over_point: Tuple,
     pub eye_v: Tuple,
     pub normal_v: Tuple,
     pub inside: bool,
@@ -52,10 +48,13 @@ impl Intersection {
             normal_v = -normal_v;
         }
 
+        let over_point = point + normal_v * EPSILON;
+
         Some(Comps {
             t,
             object,
             point,
+            over_point,
             eye_v,
             normal_v,
             inside,

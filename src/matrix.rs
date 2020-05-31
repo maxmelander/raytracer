@@ -1,11 +1,6 @@
-const EPSILON: f64 = 0.00001;
-
+use super::utils::is_equal;
 use super::tuple::Tuple;
 use std::ops::{Div, Index, IndexMut, Mul};
-
-pub fn is_equal(a: f64, b: f64) -> bool {
-    (a - b).abs() < EPSILON
-}
 
 #[derive(Debug, Copy, Clone)]
 pub struct Matrix4 {

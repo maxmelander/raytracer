@@ -6,6 +6,12 @@ use super::material::Material;
 use super::point_light::PointLight;
 use super::tuple::Tuple;
 
+pub const EPSILON: f64 = 0.00001;
+
+pub fn is_equal(a: f64, b: f64) -> bool {
+    (a - b).abs() < EPSILON
+}
+
 #[allow(dead_code, unused_variables)]
 // Phong lighting
 pub fn lighting(
@@ -14,14 +20,19 @@ pub fn lighting(
     light: PointLight,
     eye_v: Tuple,
     normal_v: Tuple,
+    in_shadow: bool,
 ) -> Result<Color, &'static str> {
     if point.is_vector() || eye_v.is_point() || normal_v.is_point() {
         return Err("point or vectors not correct format");
     }
 
     let effective_color = material.color * light.intensity;
-    let light_v = (light.position - point).normalize();
     let ambient = effective_color * material.ambient;
+    if in_shadow {
+        return Ok(ambient);
+    }
+
+    let light_v = (light.position - point).normalize();
     let mut diffuse = Color::new(0.0, 0.0, 0.0);
     let mut specular = Color::new(0.0, 0.0, 0.0);
 
