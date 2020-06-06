@@ -1,6 +1,5 @@
 use super::intersection::Intersection;
 use super::matrix::Matrix4;
-use super::sphere::Sphere;
 use super::tuple::Tuple;
 use super::world::World;
 use super::generics::{Drawables, Drawable};

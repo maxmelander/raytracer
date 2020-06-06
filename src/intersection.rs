@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 use super::utils::{is_equal, EPSILON};
 use super::ray::Ray;
 use super::tuple::Tuple;
-use super::generics::{Drawables, Drawable};
+use super::generics::Drawables;
 
 pub fn float_compare(a: f64, b: f64) -> Ordering {
     if is_equal(a, b) {

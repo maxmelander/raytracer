@@ -24,9 +24,9 @@ impl Tuple {
 
     pub fn new_vector(x: f64, y: f64, z: f64) -> Self {
         Self {
-            x: x,
-            y: y,
-            z: z,
+            x,
+            y,
+            z,
             w: 0.0,
         }
     }
@@ -157,10 +157,10 @@ impl Div<f64> for Tuple {
 
 impl PartialEq for Tuple {
     fn eq(&self, other: &Self) -> bool {
-        (is_equal(self.x, other.x)
+        is_equal(self.x, other.x)
             && is_equal(self.y, other.y)
             && is_equal(self.z, other.z)
-            && is_equal(self.w, other.w))
+            && is_equal(self.w, other.w)
     }
 }
 

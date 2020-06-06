@@ -89,9 +89,9 @@ impl Div<f64> for Color {
 
 impl PartialEq for Color {
     fn eq(&self, other: &Self) -> bool {
-        (is_equal(self.r(), other.r())
+        is_equal(self.r(), other.r())
             && is_equal(self.g(), other.g())
-            && is_equal(self.b(), other.b()))
+            && is_equal(self.b(), other.b())
     }
 }
 
