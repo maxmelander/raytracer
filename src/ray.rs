@@ -3,6 +3,7 @@ use super::matrix::Matrix4;
 use super::sphere::Sphere;
 use super::tuple::Tuple;
 use super::world::World;
+use super::generics::Drawable;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Ray {
@@ -23,22 +24,9 @@ impl Ray {
         self.origin + self.direction * t
     }
 
-    pub fn intersect(self, sphere: Sphere) -> Option<[Intersection; 2]> {
-        let i_ray = self.transform(sphere.transform.inverse()?);
-        let sphere_to_ray = i_ray.origin - sphere.origin;
-        let a = i_ray.direction.dot(i_ray.direction);
-        let b = 2.0 * i_ray.direction.dot(sphere_to_ray);
-        let c = sphere_to_ray.dot(sphere_to_ray) - 1.0;
-
-        let discriminant = b.powf(2.0) - 4.0 * a * c;
-
-        if discriminant < 0.0 {
-            return None;
-        }
-
-        let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
-        let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
-        Some([Intersection::new(t1, sphere), Intersection::new(t2, sphere)])
+    pub fn intersect<T: Drawable>(self, shape: T) -> Option<[Intersection; 2]> {
+        let local_ray = self.transform(shape.get_transform().inverse()?);
+        shape.local_intersect(local_ray)
     }
 
     // NOTE(Optimization); Is it faster to have a fixed size array here, and just not fill it up

@@ -5,6 +5,7 @@ use super::ray::*;
 use super::sphere::*;
 use super::tuple::*;
 use super::world::World;
+use super::generics::Drawables;
 
 #[test]
 fn create_ray() {
@@ -96,10 +97,10 @@ fn intersection_has_t_and_object() {
 
     let s = Sphere::new();
 
-    let i = Intersection::new(3.5, s);
+    let i = Intersection::new(3.5, Drawables::Sphere(s));
 
     assert_eq!(i.t, 3.5);
-    assert_eq!(i.object, s);
+    assert_eq!(i.object, Drawables::Sphere(s));
 }
 
 // NOTE: Using a list primitive aka array for now
@@ -123,15 +124,15 @@ fn intersect_sets_object_on_intersection() {
     let xs = r.intersect(s).unwrap();
 
     assert_eq!(xs.len(), 2);
-    assert_eq!(xs[0].object, s);
-    assert_eq!(xs[1].object, s);
+    assert_eq!(xs[0].object, Drawables::Sphere(s));
+    assert_eq!(xs[1].object, Drawables::Sphere(s));
 }
 
 #[test]
 fn hit_all_positive() {
     let s = Sphere::new();
-    let i1 = Intersection::new(1., s);
-    let i2 = Intersection::new(2., s);
+    let i1 = Intersection::new(1., Drawables::Sphere(s));
+    let i2 = Intersection::new(2., Drawables::Sphere(s));
     let xs = vec![i1, i2];
     let i = hit(&xs);
     assert_eq!(i, Some(&i1));
@@ -140,8 +141,8 @@ fn hit_all_positive() {
 #[test]
 fn hit_some_negative() {
     let s = Sphere::new();
-    let i1 = Intersection::new(-1., s);
-    let i2 = Intersection::new(1., s);
+    let i1 = Intersection::new(-1., Drawables::Sphere(s));
+    let i2 = Intersection::new(1., Drawables::Sphere(s));
     let xs = vec![i1, i2];
     let i = hit(&xs);
     assert_eq!(i, Some(&i2));
@@ -150,8 +151,8 @@ fn hit_some_negative() {
 #[test]
 fn hit_all_negative() {
     let s = Sphere::new();
-    let i1 = Intersection::new(-2., s);
-    let i2 = Intersection::new(-1., s);
+    let i1 = Intersection::new(-2., Drawables::Sphere(s));
+    let i2 = Intersection::new(-1., Drawables::Sphere(s));
     let xs = vec![i1, i2];
     let i = hit(&xs);
     assert_eq!(i, None);
@@ -160,10 +161,10 @@ fn hit_all_negative() {
 #[test]
 fn hit_lowest_non_negative() {
     let s = Sphere::new();
-    let i1 = Intersection::new(5., s);
-    let i2 = Intersection::new(7., s);
-    let i3 = Intersection::new(-3., s);
-    let i4 = Intersection::new(2., s);
+    let i1 = Intersection::new(5., Drawables::Sphere(s));
+    let i2 = Intersection::new(7., Drawables::Sphere(s));
+    let i3 = Intersection::new(-3., Drawables::Sphere(s));
+    let i4 = Intersection::new(2., Drawables::Sphere(s));
     let xs = vec![i1, i2, i3, i4];
     let i = hit(&xs);
     assert_eq!(i, Some(&i4));
@@ -237,7 +238,7 @@ fn precompute_intersection_state() {
     let shape = Sphere::new();
     let i = Intersection{
         t: 4.0,
-        object: shape
+        object: Drawables::Sphere(shape)
     };
 
     let comps = i.prepare_computations(r).unwrap();
@@ -256,7 +257,7 @@ fn precompue_hit_intersection_outside() {
 
     let i = Intersection{
         t: 4.0,
-        object: shape
+        object: Drawables::Sphere(shape)
     };
 
     let comps = i.prepare_computations(r).unwrap();
@@ -271,7 +272,7 @@ fn precompue_hit_intersection_inside() {
 
     let i = Intersection{
         t: 1.0,
-        object: shape
+        object: Drawables::Sphere(shape)
     };
 
     let comps = i.prepare_computations(r).unwrap();

@@ -33,6 +33,11 @@ mod world_tests;
 mod camera;
 mod camera_tests;
 
+mod shape;
+mod shape_tests;
+
+mod generics;
+
 use std::f64::consts::PI;
 
 use crate::canvas::Canvas;
@@ -47,6 +52,7 @@ use crate::tuple::Tuple;
 use crate::utils::lighting;
 use crate::world::World;
 use crate::camera::Camera;
+use crate::generics::Drawables;
 
 use std::fs;
 
@@ -81,7 +87,7 @@ fn draw_clock() {
 
 fn draw_sphere_world() {
     let mut floor = Sphere::new_with_transform(Matrix4::new_scaling(10., 0.01, 10.));
-    floor.material = Material {
+    floor.shape.material = Material {
         color: Color::new(1., 0.9, 0.9),
         specular: 0.0,
         ..Default::default()
@@ -94,7 +100,7 @@ fn draw_sphere_world() {
         Matrix4::new_scaling(10., 0.01, 10.);
 
     let mut left_wall = Sphere::new_with_transform(left_wall_transform);
-    left_wall.material = floor.material;
+    left_wall.shape.material = floor.shape.material;
 
     let right_wall_transform =
         Matrix4::new_translation(0., 0., 5.) *
@@ -103,11 +109,11 @@ fn draw_sphere_world() {
         Matrix4::new_scaling(10., 0.01, 10.);
 
     let mut right_wall = Sphere::new_with_transform(right_wall_transform);
-    right_wall.material = floor.material;
+    right_wall.shape.material = floor.shape.material;
 
 
     let mut middle_sphere = Sphere::new_with_transform(Matrix4::new_translation(-0.5, 1., 0.5));
-    middle_sphere.material = Material {
+    middle_sphere.shape.material = Material {
         color: Color::new(0.8, 0.2, 0.8),
         diffuse: 0.7,
         specular: 0.9,
@@ -119,7 +125,7 @@ fn draw_sphere_world() {
         Matrix4::new_translation(1.5, 0.5, -0.5) *
         Matrix4::new_scaling(0.5, 0.5, 0.5)
     );
-    right_sphere.material = Material {
+    right_sphere.shape.material = Material {
         color: Color::new(0.2, 0.2, 1.0),
         diffuse: 0.7,
         specular: 0.1,
@@ -131,7 +137,7 @@ fn draw_sphere_world() {
         Matrix4::new_translation(-1.5, 0.33, -0.75) *
         Matrix4::new_scaling(0.33, 0.33, 0.33)
     );
-    small_sphere.material = Material {
+    small_sphere.shape.material = Material {
         color: Color::new(1.0, 0.2, 0.1),
         diffuse: 0.7,
         specular: 0.3,
@@ -146,7 +152,13 @@ fn draw_sphere_world() {
 
     let world = World {
         lights: vec![light, light2],
-        objects: vec![floor, left_wall, right_wall, middle_sphere, right_sphere, small_sphere]
+        objects: vec![
+            Drawables::Sphere(floor),
+            Drawables::Sphere(left_wall),
+            Drawables::Sphere(right_wall),
+            Drawables::Sphere(middle_sphere),
+            Drawables::Sphere(right_sphere),
+            Drawables::Sphere(small_sphere)]
     };
 
     let mut camera = Camera::new(600, 600, PI / 3.);
@@ -160,54 +172,54 @@ fn draw_sphere_world() {
     fs::write("/home/maxmelander/test.ppm", canvas.to_ppm()).expect("Unable to write file");
 }
 
-fn draw_sphere() {
-    // Scene setup
-    let ray_origin = Tuple::new_point(0., 0., -5.);
-    let wall_z = 10.;
-    let wall_size = 7.;
-    let canvas_pixels = 800.;
-    let pixel_size = wall_size / canvas_pixels;
-    let half = wall_size / 2.;
-    let mut sphere = Sphere::new();
-    sphere.material = Material {
-        color: Color::new(1., 0.2, 1.),
-        ..Default::default()
-    };
+// fn draw_sphere() {
+//     // Scene setup
+//     let ray_origin = Tuple::new_point(0., 0., -5.);
+//     let wall_z = 10.;
+//     let wall_size = 7.;
+//     let canvas_pixels = 800.;
+//     let pixel_size = wall_size / canvas_pixels;
+//     let half = wall_size / 2.;
+//     let mut sphere = Sphere::new();
+//     sphere.shape.material = Material {
+//         color: Color::new(1., 0.2, 1.),
+//         ..Default::default()
+//     };
 
-    let light =
-        PointLight::new(Tuple::new_point(12., 10., -10.), Color::new(0.3, 0.3, 1.0)).unwrap();
+//     let light =
+//         PointLight::new(Tuple::new_point(12., 10., -10.), Color::new(0.3, 0.3, 1.0)).unwrap();
 
-    //sphere.set_transform(Matrix4::new_scaling(1.0, 0.9, 1.));
+//     //sphere.set_transform(Matrix4::new_scaling(1.0, 0.9, 1.));
 
-    // Canvas setup
-    let mut canvas = Canvas::new(canvas_pixels as usize, canvas_pixels as usize);
+//     // Canvas setup
+//     let mut canvas = Canvas::new(canvas_pixels as usize, canvas_pixels as usize);
 
-    // For each coordinate in our "screen", shoot a ray from the ray origin,
-    // through the sphere and to the screen coordinate. If there was a hit,
-    // then draw the coordinate to the screen
-    for y in 0..canvas_pixels as usize - 1 {
-        let world_y = half - pixel_size * y as f64;
+//     // For each coordinate in our "screen", shoot a ray from the ray origin,
+//     // through the sphere and to the screen coordinate. If there was a hit,
+//     // then draw the coordinate to the screen
+//     for y in 0..canvas_pixels as usize - 1 {
+//         let world_y = half - pixel_size * y as f64;
 
-        for x in 0..canvas_pixels as usize - 1 {
-            let world_x = -half + pixel_size * x as f64;
+//         for x in 0..canvas_pixels as usize - 1 {
+//             let world_x = -half + pixel_size * x as f64;
 
-            let position = Tuple::new_point(world_x, world_y, wall_z);
-            let r = Ray::new(ray_origin, (position - ray_origin).normalize()).unwrap();
-            let xs = r.intersect(sphere);
-            if let Some(intersections) = xs {
-                if let Some(hit) = hit(&intersections) {
-                    let point = r.position(hit.t);
-                    let normal = hit.object.normal_at(point).unwrap();
-                    let eye = -r.direction;
-                    let color = lighting(hit.object.material, point, light, eye, normal, false).unwrap();
-                    let _ = canvas.write_pixel(x, y, color);
-                }
-            }
-        }
-    }
-    let ppm = canvas.to_ppm();
-    fs::write("/Users/maxm/Development/test.ppm", ppm).expect("Unable to write file");
-}
+//             let position = Tuple::new_point(world_x, world_y, wall_z);
+//             let r = Ray::new(ray_origin, (position - ray_origin).normalize()).unwrap();
+//             let xs = r.intersect(sphere);
+//             if let Some(intersections) = xs {
+//                 if let Some(hit) = hit(&intersections) {
+//                     let point = r.position(hit.t);
+//                     let normal = hit.object.local_normal_at(point).unwrap();
+//                     let eye = -r.direction;
+//                     let color = lighting(hit.object.shape.material, point, light, eye, normal, false).unwrap();
+//                     let _ = canvas.write_pixel(x, y, color);
+//                 }
+//             }
+//         }
+//     }
+//     let ppm = canvas.to_ppm();
+//     fs::write("/Users/maxm/Development/test.ppm", ppm).expect("Unable to write file");
+// }
 
 fn main() {
     draw_sphere_world();

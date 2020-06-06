@@ -8,11 +8,12 @@ use super::intersection::Comps;
 use super::ray::Ray;
 use super::utils::lighting;
 use super::intersection::hit;
+use super::generics::{Drawables, Drawable};
 
 #[allow(dead_code)]
 pub struct World {
     pub lights: Vec<PointLight>,
-    pub objects: Vec<Sphere>
+    pub objects: Vec<Drawables>
 }
 
 #[allow(dead_code)]
@@ -22,7 +23,19 @@ impl World {
 
         for light in self.lights.iter() {
             let in_shadow = self.is_shadowed(comps.over_point, light);
-            if let Ok(result) = lighting(comps.object.material, comps.over_point, *light, comps.eye_v, comps.normal_v, in_shadow) {
+
+            let object = match comps.object {
+                Drawables::Sphere(sphere) => sphere
+            };
+
+            if let Ok(result) = lighting(
+                object.shape.material,
+                comps.over_point,
+                *light,
+                comps.eye_v,
+                comps.normal_v,
+                in_shadow
+            ) {
                 color = color + result;
             }
         }
@@ -60,7 +73,7 @@ impl Default for World {
     fn default() -> Self {
         let light = PointLight::new(Tuple::new_point(-10., 10., -10.), Color::new(1., 1., 1.)).unwrap();
         let mut s1 = Sphere::new();
-        s1.material = Material{
+        s1.shape.material = Material{
             color: Color::new(0.8, 1.0, 0.6),
             diffuse: 0.7,
             specular: 0.2,
@@ -68,7 +81,7 @@ impl Default for World {
         };
         let s2 = Sphere::new_with_transform(Matrix4::new_scaling(0.5, 0.5, 0.5));
 
-        let objects = vec!(s1, s2);
+        let objects = vec!(Drawables::Sphere(s1), Drawables::Sphere(s2));
 
         Self {lights: vec![light], objects}
     }

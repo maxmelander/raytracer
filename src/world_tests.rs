@@ -9,13 +9,14 @@ use super::material::Material;
 use super::matrix::Matrix4;
 use super::ray::Ray;
 use super::intersection::Intersection;
+use super::generics::Drawables;
 use super::utils::EPSILON;
 
 #[test]
 fn default_world() {
     let light = PointLight::new(Tuple::new_point(-10., 10., -10.), Color::new(1., 1., 1.)).unwrap();
     let mut s1 = Sphere::new();
-    s1.material = Material{
+    s1.shape.material = Material{
         color: Color::new(0.8, 1.0, 0.6),
         diffuse: 0.7,
         specular: 0.2,
@@ -26,8 +27,8 @@ fn default_world() {
     let w: World = Default::default();
 
     assert_eq!(w.lights[0], light);
-    assert_eq!(w.objects.contains(&s1), true);
-    assert_eq!(w.objects.contains(&s2), true);
+    assert_eq!(w.objects.contains(&Drawables::Sphere(s1)), true);
+    assert_eq!(w.objects.contains(&Drawables::Sphere(s2)), true);
 }
 
 #[test]
@@ -92,21 +93,21 @@ fn color_ray_intersect_behind() {
     };
 
     let mut outer = Sphere::new();
-    outer.material = material;
+    outer.shape.material = material;
 
     let mut inner = Sphere::new();
-    inner.material = material;
+    inner.shape.material = material;
 
 
     let w = World {
-        objects: vec![outer, inner],
+        objects: vec![Drawables::Sphere(outer), Drawables::Sphere(inner)],
         ..Default::default()
     };
 
     let r = Ray::new(Tuple::new_point(0., 0., 0.75), Tuple::new_vector(0., 0., -1.)).unwrap();
 
     let c = w.color_at(r);
-    assert_eq!(c, inner.material.color);
+    assert_eq!(c, inner.shape.material.color);
 }
 
 #[test]
@@ -147,11 +148,11 @@ fn shade_hit_intersection_in_shadow() {
     let s2 = Sphere::new_with_transform(Matrix4::new_translation(0., 0., 10.));
     let mut w = World {
         lights: vec![PointLight::new(Tuple::new_point(0., 0., -10.), Color::new(1., 1., 1.)).unwrap()],
-        objects: vec![s1, s2]
+        objects: vec![Drawables::Sphere(s1), Drawables::Sphere(s2)]
     };
 
     let r = Ray::new(Tuple::new_point(0., 0., 5.), Tuple::new_vector(0., 0., 1.)).unwrap();
-    let i = Intersection::new(4., s2);
+    let i = Intersection::new(4., Drawables::Sphere(s2));
     let comps = i.prepare_computations(r).unwrap();
 
     let c = w.shade_hit(comps);
@@ -162,7 +163,7 @@ fn shade_hit_intersection_in_shadow() {
 fn hit_should_offset() {
     let r = Ray::new(Tuple::new_point(0., 0., -5.), Tuple::new_vector(0., 0., 1.)).unwrap();
     let s = Sphere::new_with_transform(Matrix4::new_translation(0., 0., 1.));
-    let i = Intersection::new(5., s);
+    let i = Intersection::new(5., Drawables::Sphere(s));
     let comps = i.prepare_computations(r).unwrap();
 
     assert_eq!(comps.over_point.z < -EPSILON / 2.0, true);

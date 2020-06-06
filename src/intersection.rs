@@ -2,8 +2,8 @@ use std::cmp::Ordering;
 
 use super::utils::{is_equal, EPSILON};
 use super::ray::Ray;
-use super::sphere::Sphere;
 use super::tuple::Tuple;
+use super::generics::{Drawables, Drawable};
 
 pub fn float_compare(a: f64, b: f64) -> Ordering {
     if is_equal(a, b) {
@@ -18,7 +18,7 @@ pub fn float_compare(a: f64, b: f64) -> Ordering {
 #[derive(Debug, Copy, Clone)]
 pub struct Comps {
     pub t: f64,
-    pub object: Sphere,
+    pub object: Drawables,
     pub point: Tuple,
     pub over_point: Tuple,
     pub eye_v: Tuple,
@@ -29,18 +29,24 @@ pub struct Comps {
 #[derive(Debug, Copy, Clone)]
 pub struct Intersection {
     pub t: f64,
-    pub object: Sphere, // NOTE: This one should be more general later
+    pub object: Drawables,
 }
 
 #[allow(dead_code)]
 impl Intersection {
+    pub fn new(t: f64, object: Drawables) -> Self {
+        Self { t, object }
+    }
+
     pub fn prepare_computations(self, ray: Ray) -> Option<Comps> {
         let t = self.t;
         let object = self.object;
         let point = ray.position(self.t);
 
         let eye_v = -ray.direction;
-        let mut normal_v = object.normal_at(point)?;
+
+        let mut normal_v = object.local_normal_at(point)?;
+
         let mut inside = false;
 
         if normal_v.dot(eye_v) < 0.0 {
@@ -62,13 +68,6 @@ impl Intersection {
     }
 }
 
-#[allow(dead_code)]
-impl Intersection {
-    pub fn new(t: f64, object: Sphere) -> Self {
-        Self { t, object }
-    }
-}
-
 impl Ord for Intersection {
     fn cmp(&self, other: &Self) -> Ordering {
         float_compare(self.t, other.t)
@@ -83,7 +82,14 @@ impl PartialOrd for Intersection {
 
 impl PartialEq for Intersection {
     fn eq(&self, other: &Self) -> bool {
-        is_equal(self.t, other.t) && self.object == other.object
+        match self.object {
+            Drawables::Sphere(sphere) => {
+                if let Drawables::Sphere(other_sphere) = other.object {
+                    return is_equal(self.t, other.t) && sphere == other_sphere
+                }
+                false
+            }
+        }
     }
 }
 
