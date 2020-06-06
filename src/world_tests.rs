@@ -39,7 +39,7 @@ fn shade_intersection() {
     let shape = w.objects[0];
     let i = Intersection {
         t: 4.0,
-        object: shape
+        object: &shape
     };
 
     let comps = i.prepare_computations(r).unwrap();
@@ -59,7 +59,7 @@ fn shade_intersection_inside() {
     let shape = w.objects[1];
     let i = Intersection {
         t: 0.5,
-        object: shape
+        object: &shape
     };
 
     let comps = i.prepare_computations(r).unwrap();
@@ -144,15 +144,15 @@ fn no_shadow_object_behind_point() {
 
 #[test]
 fn shade_hit_intersection_in_shadow() {
-    let s1 = Sphere::new();
-    let s2 = Sphere::new_with_transform(Matrix4::new_translation(0., 0., 10.));
+    let s1 = Drawables::Sphere(Sphere::new());
+    let s2 = Drawables::Sphere(Sphere::new_with_transform(Matrix4::new_translation(0., 0., 10.)));
     let mut w = World {
         lights: vec![PointLight::new(Tuple::new_point(0., 0., -10.), Color::new(1., 1., 1.)).unwrap()],
-        objects: vec![Drawables::Sphere(s1), Drawables::Sphere(s2)]
+        objects: vec![s1, s2]
     };
 
     let r = Ray::new(Tuple::new_point(0., 0., 5.), Tuple::new_vector(0., 0., 1.)).unwrap();
-    let i = Intersection::new(4., Drawables::Sphere(s2));
+    let i = Intersection::new(4., &s2);
     let comps = i.prepare_computations(r).unwrap();
 
     let c = w.shade_hit(comps);
@@ -162,8 +162,8 @@ fn shade_hit_intersection_in_shadow() {
 #[test]
 fn hit_should_offset() {
     let r = Ray::new(Tuple::new_point(0., 0., -5.), Tuple::new_vector(0., 0., 1.)).unwrap();
-    let s = Sphere::new_with_transform(Matrix4::new_translation(0., 0., 1.));
-    let i = Intersection::new(5., Drawables::Sphere(s));
+    let s = Drawables::Sphere(Sphere::new_with_transform(Matrix4::new_translation(0., 0., 1.)));
+    let i = Intersection::new(5., &s);
     let comps = i.prepare_computations(r).unwrap();
 
     assert_eq!(comps.over_point.z < -EPSILON / 2.0, true);

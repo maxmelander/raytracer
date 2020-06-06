@@ -16,6 +16,9 @@ mod ray_tests;
 mod sphere;
 mod sphere_tests;
 
+mod plane;
+mod plane_tests;
+
 mod intersection;
 
 mod point_light;
@@ -48,6 +51,7 @@ use crate::matrix::Matrix4;
 use crate::point_light::PointLight;
 use crate::ray::Ray;
 use crate::sphere::Sphere;
+use crate::plane::Plane;
 use crate::tuple::Tuple;
 use crate::utils::lighting;
 use crate::world::World;
@@ -86,29 +90,24 @@ fn draw_clock() {
 }
 
 fn draw_sphere_world() {
-    let mut floor = Sphere::new_with_transform(Matrix4::new_scaling(10., 0.01, 10.));
+    let mut floor = Plane::new();
     floor.shape.material = Material {
         color: Color::new(1., 0.9, 0.9),
         specular: 0.0,
         ..Default::default()
     };
 
-    let left_wall_transform =
-        Matrix4::new_translation(0., 0., 5.) *
-        Matrix4::new_rotation_y(-PI / 4.) *
-        Matrix4::new_rotation_x(PI / 2.0) *
-        Matrix4::new_scaling(10., 0.01, 10.);
+    let left_wall_transform = Matrix4::new_translation(0., 0., 2.) * Matrix4::new_rotation_x(PI / 2.0);
 
-    let mut left_wall = Sphere::new_with_transform(left_wall_transform);
+    let mut left_wall = Plane::new_with_transform(left_wall_transform);
     left_wall.shape.material = floor.shape.material;
 
     let right_wall_transform =
         Matrix4::new_translation(0., 0., 5.) *
         Matrix4::new_rotation_y(PI / 4.) *
-        Matrix4::new_rotation_x(PI / 2.0) *
-        Matrix4::new_scaling(10., 0.01, 10.);
+        Matrix4::new_rotation_x(PI / 2.0);
 
-    let mut right_wall = Sphere::new_with_transform(right_wall_transform);
+    let mut right_wall = Plane::new_with_transform(right_wall_transform);
     right_wall.shape.material = floor.shape.material;
 
 
@@ -145,23 +144,23 @@ fn draw_sphere_world() {
     };
 
     let light =
-        PointLight::new(Tuple::new_point(-10., 10., -10.), Color::new(0.4, 0.1, 0.4)).unwrap();
+        PointLight::new(Tuple::new_point(-10., 10., -10.), Color::new(0.7, 0.7, 1.0)).unwrap();
 
     let light2 =
-        PointLight::new(Tuple::new_point(15., 15., -10.), Color::new(0.1, 0.0, 0.0)).unwrap();
+        PointLight::new(Tuple::new_point(15., 15., -10.), Color::new(0.2, 0.0, 0.0)).unwrap();
 
     let world = World {
         lights: vec![light, light2],
         objects: vec![
-            Drawables::Sphere(floor),
-            Drawables::Sphere(left_wall),
-            Drawables::Sphere(right_wall),
+            Drawables::Plane(floor),
+            Drawables::Plane(left_wall),
+            //Drawables::Plane(right_wall),
             Drawables::Sphere(middle_sphere),
             Drawables::Sphere(right_sphere),
             Drawables::Sphere(small_sphere)]
     };
 
-    let mut camera = Camera::new(600, 600, PI / 3.);
+    let mut camera = Camera::new(500, 500, PI / 3.);
     camera.transform = Matrix4::new_view_transform(
         Tuple::new_point(0., 1.5, -5.),
         Tuple::new_point(0., 1., 0.),

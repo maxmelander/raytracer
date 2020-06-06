@@ -15,10 +15,10 @@ pub fn float_compare(a: f64, b: f64) -> Ordering {
     Ordering::Greater
 }
 
-#[derive(Debug, Copy, Clone)]
-pub struct Comps {
+#[derive(Debug)]
+pub struct Comps<'a> {
     pub t: f64,
-    pub object: Drawables,
+    pub object: &'a Drawables,
     pub point: Tuple,
     pub over_point: Tuple,
     pub eye_v: Tuple,
@@ -27,25 +27,25 @@ pub struct Comps {
 }
 
 #[derive(Debug, Copy, Clone)]
-pub struct Intersection {
+pub struct Intersection<'a> {
     pub t: f64,
-    pub object: Drawables,
+    pub object: &'a Drawables,
 }
 
 #[allow(dead_code)]
-impl Intersection {
-    pub fn new(t: f64, object: Drawables) -> Self {
+impl<'a> Intersection<'a> {
+    pub fn new(t: f64, object: &'a Drawables) -> Self {
         Self { t, object }
     }
 
-    pub fn prepare_computations(self, ray: Ray) -> Option<Comps> {
+    pub fn prepare_computations(&self, ray: Ray) -> Option<Comps> {
         let t = self.t;
         let object = self.object;
         let point = ray.position(self.t);
 
         let eye_v = -ray.direction;
 
-        let mut normal_v = object.local_normal_at(point)?;
+        let mut normal_v = object.normal_at(point)?;
 
         let mut inside = false;
 
@@ -68,41 +68,35 @@ impl Intersection {
     }
 }
 
-impl Ord for Intersection {
+impl Ord for Intersection<'_> {
     fn cmp(&self, other: &Self) -> Ordering {
         float_compare(self.t, other.t)
     }
 }
 
-impl PartialOrd for Intersection {
+impl PartialOrd for Intersection<'_> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(float_compare(self.t, other.t))
     }
 }
 
-impl PartialEq for Intersection {
+impl PartialEq for Intersection<'_> {
     fn eq(&self, other: &Self) -> bool {
-        match self.object {
-            Drawables::Sphere(sphere) => {
-                if let Drawables::Sphere(other_sphere) = other.object {
-                    return is_equal(self.t, other.t) && sphere == other_sphere
-                }
-                false
-            }
-        }
+        is_equal(self.t, other.t) && self.object == other.object
     }
 }
 
-impl Eq for Intersection {}
+impl Eq for Intersection<'_> {}
 
 #[allow(dead_code)]
-pub fn hit(xs: &[Intersection]) -> Option<&Intersection> {
+pub fn hit<'a>(xs: &[Intersection<'a>]) -> Option<Intersection<'a>> {
     let mut iter = xs.iter().filter(|x| x.t.is_sign_positive());
     let init = iter.next()?;
 
-    iter.try_fold(init, |acc, x| {
-        let cmp = x.partial_cmp(acc)?;
-        let min = if let Ordering::Less = cmp { x } else { acc };
-        Some(min)
+    iter.try_fold(*init, |acc, x| {
+        let cmp = x.partial_cmp(&acc)?;
+        let min = if let Ordering::Less = cmp { x } else { &acc };
+        Some(*min)
     })
+
 }

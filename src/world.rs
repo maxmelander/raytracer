@@ -24,12 +24,8 @@ impl World {
         for light in self.lights.iter() {
             let in_shadow = self.is_shadowed(comps.over_point, light);
 
-            let object = match comps.object {
-                Drawables::Sphere(sphere) => sphere
-            };
-
             if let Ok(result) = lighting(
-                object.shape.material,
+                comps.object.get_shape().material,
                 comps.over_point,
                 *light,
                 comps.eye_v,

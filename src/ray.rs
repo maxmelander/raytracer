@@ -3,7 +3,7 @@ use super::matrix::Matrix4;
 use super::sphere::Sphere;
 use super::tuple::Tuple;
 use super::world::World;
-use super::generics::Drawable;
+use super::generics::{Drawables, Drawable};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Ray {
@@ -24,9 +24,9 @@ impl Ray {
         self.origin + self.direction * t
     }
 
-    pub fn intersect<T: Drawable>(self, shape: T) -> Option<[Intersection; 2]> {
-        let local_ray = self.transform(shape.get_transform().inverse()?);
-        shape.local_intersect(local_ray)
+    pub fn intersect(self, object: &Drawables) -> Option<[Option<Intersection>; 2]> {
+        let local_ray = self.transform(object.get_transform().inverse()?);
+        object.intersect(local_ray)
     }
 
     // NOTE(Optimization); Is it faster to have a fixed size array here, and just not fill it up
@@ -37,8 +37,12 @@ impl Ray {
 
         let objects_iter = world.objects.iter();
         for o in objects_iter {
-            if let Some(i) = self.intersect(*o) {
-                xs.extend_from_slice(&i);
+            if let Some(intersections) = self.intersect(o) {
+                for o_i in intersections.iter() {
+                    if let Some(i) = o_i {
+                        xs.push(*i)
+                    }
+                }
             }
         }
 

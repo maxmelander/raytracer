@@ -32,35 +32,35 @@ fn point_from_dist() {
 fn ray_sphere_intersects() {
     let ray = Ray::new(Tuple::new_point(0., 0., -5.), Tuple::new_vector(0., 0., 1.)).unwrap();
 
-    let sphere = Sphere::new();
+    let sphere = Drawables::Sphere(Sphere::new());
 
-    let xs = ray.intersect(sphere).unwrap();
+    let xs = ray.intersect(&sphere).unwrap();
 
     assert_eq!(xs.len(), 2);
-    assert_eq!(xs[0].t, 4.0);
-    assert_eq!(xs[1].t, 6.0);
+    assert_eq!(xs[0].unwrap().t, 4.0);
+    assert_eq!(xs[1].unwrap().t, 6.0);
 }
 
 #[test]
 fn ray_sphere_tangent_intersect() {
     let r = Ray::new(Tuple::new_point(0., 1., -5.), Tuple::new_vector(0., 0., 1.)).unwrap();
 
-    let s = Sphere::new();
+    let s = Drawables::Sphere(Sphere::new());
 
-    let xs = r.intersect(s).unwrap();
+    let xs = r.intersect(&s).unwrap();
 
     assert_eq!(xs.len(), 2);
-    assert_eq!(xs[0].t, 5.0);
-    assert_eq!(xs[1].t, 5.0);
+    assert_eq!(xs[0].unwrap().t, 5.0);
+    assert_eq!(xs[1].unwrap().t, 5.0);
 }
 
 #[test]
 fn ray_sphere_miss() {
     let r = Ray::new(Tuple::new_point(0., 2., -5.), Tuple::new_vector(0., 0., 1.)).unwrap();
 
-    let s = Sphere::new();
+    let s = Drawables::Sphere(Sphere::new());
 
-    let xs = r.intersect(s);
+    let xs = r.intersect(&s);
 
     assert_eq!(xs, None);
 }
@@ -69,38 +69,38 @@ fn ray_sphere_miss() {
 fn ray_sphere_inside() {
     let r = Ray::new(Tuple::new_point(0., 0., 0.), Tuple::new_vector(0., 0., 1.)).unwrap();
 
-    let s = Sphere::new();
+    let s = Drawables::Sphere(Sphere::new());
 
-    let xs = r.intersect(s).unwrap();
+    let xs = r.intersect(&s).unwrap();
 
     assert_eq!(xs.len(), 2);
-    assert_eq!(xs[0].t, -1.0);
-    assert_eq!(xs[1].t, 1.0);
+    assert_eq!(xs[0].unwrap().t, -1.0);
+    assert_eq!(xs[1].unwrap().t, 1.0);
 }
 
 #[test]
 fn ray_sphere_behind() {
     let r = Ray::new(Tuple::new_point(0., 0., 5.), Tuple::new_vector(0., 0., 1.)).unwrap();
 
-    let s = Sphere::new();
+    let s = Drawables::Sphere(Sphere::new());
 
-    let xs = r.intersect(s).unwrap();
+    let xs = r.intersect(&s).unwrap();
 
     assert_eq!(xs.len(), 2);
-    assert_eq!(xs[0].t, -6.0);
-    assert_eq!(xs[1].t, -4.0);
+    assert_eq!(xs[0].unwrap().t, -6.0);
+    assert_eq!(xs[1].unwrap().t, -4.0);
 }
 
 #[test]
 fn intersection_has_t_and_object() {
     let r = Ray::new(Tuple::new_point(0., 0., 5.), Tuple::new_vector(0., 0., 1.)).unwrap();
 
-    let s = Sphere::new();
+    let s = Drawables::Sphere(Sphere::new());
 
-    let i = Intersection::new(3.5, Drawables::Sphere(s));
+    let i = Intersection::new(3.5, &s);
 
     assert_eq!(i.t, 3.5);
-    assert_eq!(i.object, Drawables::Sphere(s));
+    assert_eq!(*i.object, s);
 }
 
 // NOTE: Using a list primitive aka array for now
@@ -119,40 +119,42 @@ fn intersection_has_t_and_object() {
 fn intersect_sets_object_on_intersection() {
     let r = Ray::new(Tuple::new_point(0., 0., -5.), Tuple::new_vector(0., 0., 1.)).unwrap();
 
-    let s = Sphere::new();
+    let s = Drawables::Sphere(Sphere::new());
 
-    let xs = r.intersect(s).unwrap();
+    let xs = r.intersect(&s).unwrap();
 
     assert_eq!(xs.len(), 2);
-    assert_eq!(xs[0].object, Drawables::Sphere(s));
-    assert_eq!(xs[1].object, Drawables::Sphere(s));
+    assert_eq!(*xs[0].unwrap().object, s);
+    assert_eq!(*xs[1].unwrap().object, s);
 }
 
 #[test]
 fn hit_all_positive() {
-    let s = Sphere::new();
-    let i1 = Intersection::new(1., Drawables::Sphere(s));
-    let i2 = Intersection::new(2., Drawables::Sphere(s));
+    let s = Drawables::Sphere(Sphere::new());
+    let i1 = Intersection::new(1., &s);
+    let i2 = Intersection::new(2., &s);
+
     let xs = vec![i1, i2];
     let i = hit(&xs);
-    assert_eq!(i, Some(&i1));
+
+    assert_eq!(i, Some(i1));
 }
 
 #[test]
 fn hit_some_negative() {
-    let s = Sphere::new();
-    let i1 = Intersection::new(-1., Drawables::Sphere(s));
-    let i2 = Intersection::new(1., Drawables::Sphere(s));
+    let s = Drawables::Sphere(Sphere::new());
+    let i1 = Intersection::new(-1., &s);
+    let i2 = Intersection::new(1., &s);
     let xs = vec![i1, i2];
     let i = hit(&xs);
-    assert_eq!(i, Some(&i2));
+    assert_eq!(i, Some(i2));
 }
 
 #[test]
 fn hit_all_negative() {
-    let s = Sphere::new();
-    let i1 = Intersection::new(-2., Drawables::Sphere(s));
-    let i2 = Intersection::new(-1., Drawables::Sphere(s));
+    let s = Drawables::Sphere(Sphere::new());
+    let i1 = Intersection::new(-2., &s);
+    let i2 = Intersection::new(-1., &s);
     let xs = vec![i1, i2];
     let i = hit(&xs);
     assert_eq!(i, None);
@@ -160,14 +162,17 @@ fn hit_all_negative() {
 
 #[test]
 fn hit_lowest_non_negative() {
-    let s = Sphere::new();
-    let i1 = Intersection::new(5., Drawables::Sphere(s));
-    let i2 = Intersection::new(7., Drawables::Sphere(s));
-    let i3 = Intersection::new(-3., Drawables::Sphere(s));
-    let i4 = Intersection::new(2., Drawables::Sphere(s));
+    let s = Drawables::Sphere(Sphere::new());
+
+    let i1 = Intersection::new(5., &s);
+    let i2 = Intersection::new(7., &s);
+    let i3 = Intersection::new(-3., &s);
+    let i4 = Intersection::new(2., &s);
+
     let xs = vec![i1, i2, i3, i4];
+
     let i = hit(&xs);
-    assert_eq!(i, Some(&i4));
+    assert_eq!(i, Some(i4));
 }
 
 #[test]
@@ -198,22 +203,22 @@ fn ray_scaling() {
 fn scaled_sphere_intersect() {
     let r = Ray::new(Tuple::new_point(0., 0., -5.), Tuple::new_vector(0., 0., 1.)).unwrap();
 
-    let s = Sphere::new_with_transform(Matrix4::new_scaling(2., 2., 2.));
+    let s = Drawables::Sphere(Sphere::new_with_transform(Matrix4::new_scaling(2., 2., 2.)));
 
-    let xs = r.intersect(s).unwrap();
+    let xs = r.intersect(&s).unwrap();
 
     assert_eq!(xs.len(), 2);
-    assert_eq!(xs[0].t, 3.);
-    assert_eq!(xs[1].t, 7.);
+    assert_eq!(xs[0].unwrap().t, 3.);
+    assert_eq!(xs[1].unwrap().t, 7.);
 }
 
 #[test]
 fn translated_sphere_intersect() {
     let r = Ray::new(Tuple::new_point(0., 0., -5.), Tuple::new_vector(0., 0., 1.)).unwrap();
 
-    let s = Sphere::new_with_transform(Matrix4::new_translation(5., 0., 0.));
+    let s = Drawables::Sphere(Sphere::new_with_transform(Matrix4::new_translation(5., 0., 0.)));
 
-    let xs = r.intersect(s);
+    let xs = r.intersect(&s);
 
     assert_eq!(xs, None);
 }
@@ -238,7 +243,7 @@ fn precompute_intersection_state() {
     let shape = Sphere::new();
     let i = Intersection{
         t: 4.0,
-        object: Drawables::Sphere(shape)
+        object: &Drawables::Sphere(shape)
     };
 
     let comps = i.prepare_computations(r).unwrap();
@@ -257,7 +262,7 @@ fn precompue_hit_intersection_outside() {
 
     let i = Intersection{
         t: 4.0,
-        object: Drawables::Sphere(shape)
+        object: &Drawables::Sphere(shape)
     };
 
     let comps = i.prepare_computations(r).unwrap();
@@ -272,7 +277,7 @@ fn precompue_hit_intersection_inside() {
 
     let i = Intersection{
         t: 1.0,
-        object: Drawables::Sphere(shape)
+        object: &Drawables::Sphere(shape)
     };
 
     let comps = i.prepare_computations(r).unwrap();
