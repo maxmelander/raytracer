@@ -1,7 +1,9 @@
 #[cfg(test)]
-use super::shape::Shape;
 
-#[test]
-fn shape_has_default_transformation() {
+mod shape_tests {
 
+    #[test]
+    fn shape_has_default_transformation() {
+
+    }
 }

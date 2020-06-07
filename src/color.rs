@@ -3,9 +3,9 @@ use super::utils::is_equal;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Color {
-    r: f64,
-    g: f64,
-    b: f64,
+    pub r: f64,
+    pub g: f64,
+    pub b: f64,
 }
 
 #[allow(dead_code)]

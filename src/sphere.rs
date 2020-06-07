@@ -1,7 +1,7 @@
 use super::matrix::Matrix4;
 use super::tuple::Tuple;
 use super::shape::Shape;
-use super::generics::{Drawable, Drawables};
+use super::generics::Drawable;
 use super::ray::Ray;
 
 #[derive(Debug, Copy, Clone, PartialEq)]

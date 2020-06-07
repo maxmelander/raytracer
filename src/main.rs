@@ -39,27 +39,29 @@ mod camera_tests;
 mod shape;
 mod shape_tests;
 
+mod patterns;
+mod patterns_tests;
+
 mod generics;
 
 use std::f64::consts::PI;
 
 use crate::canvas::Canvas;
 use crate::color::Color;
-use crate::intersection::*;
 use crate::material::Material;
 use crate::matrix::Matrix4;
 use crate::point_light::PointLight;
-use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::plane::Plane;
 use crate::tuple::Tuple;
-use crate::utils::lighting;
 use crate::world::World;
 use crate::camera::Camera;
 use crate::generics::Drawables;
+use crate::patterns::{Patterns, Pattern};
 
 use std::fs;
 
+#[allow(dead_code)]
 fn draw_clock() {
     let width = 500;
     let height = 500;
@@ -91,9 +93,12 @@ fn draw_clock() {
 
 fn draw_sphere_world() {
     let mut floor = Plane::new();
+    let mut pattern1 = Patterns::new_checker(Color::new(0.2, 0.2, 0.2), Color::new(0.4,0.4,0.4));
+    pattern1.set_transform(Matrix4::new_scaling(0.4, 0.4, 0.4));
     floor.shape.material = Material {
         color: Color::new(1., 0.9, 0.9),
         specular: 0.0,
+        pattern: Some(pattern1),
         ..Default::default()
     };
 
@@ -112,23 +117,29 @@ fn draw_sphere_world() {
 
 
     let mut middle_sphere = Sphere::new_with_transform(Matrix4::new_translation(-0.5, 1., 0.5));
+
     middle_sphere.shape.material = Material {
-        color: Color::new(0.8, 0.2, 0.8),
+        color: Color::new(0.1, 0.1, 0.1),
         diffuse: 0.7,
-        specular: 0.9,
-        shininess: 400.,
+        specular: 1.0,
+        shininess: 800.,
         ..Default::default()
     };
 
     let mut right_sphere = Sphere::new_with_transform(
         Matrix4::new_translation(1.5, 0.5, -0.5) *
-        Matrix4::new_scaling(0.5, 0.5, 0.5)
+        Matrix4::new_scaling(0.5, 0.5, 0.5) *
+        Matrix4::new_rotation_y(PI / 2.)
     );
+
+    let mut pattern2 = Patterns::new_stripe(Color::new(0.2, 0.2, 0.2), Color::new(0.4,0.4,0.4));
+    pattern2.set_transform(Matrix4::new_scaling(0.2, 0.2, 0.2));
     right_sphere.shape.material = Material {
         color: Color::new(0.2, 0.2, 1.0),
         diffuse: 0.7,
         specular: 0.1,
         shininess: 100.,
+        pattern: Some(pattern2),
         ..Default::default()
     };
 
@@ -136,10 +147,17 @@ fn draw_sphere_world() {
         Matrix4::new_translation(-1.5, 0.33, -0.75) *
         Matrix4::new_scaling(0.33, 0.33, 0.33)
     );
+
+    let mut pattern3 = Patterns::new_gradient(Color::new(0.8, 0.0, 0.8), Color::new(0.1,0.1,1.0));
+    pattern3.set_transform(
+        Matrix4::new_translation(1.0, 0., 0.) *
+        Matrix4::new_scaling(2.0, 2.0, 2.0)
+    );
     small_sphere.shape.material = Material {
         color: Color::new(1.0, 0.2, 0.1),
         diffuse: 0.7,
         specular: 0.3,
+        pattern: Some(pattern3),
         ..Default::default()
     };
 
@@ -147,7 +165,7 @@ fn draw_sphere_world() {
         PointLight::new(Tuple::new_point(-10., 10., -10.), Color::new(0.7, 0.7, 1.0)).unwrap();
 
     let light2 =
-        PointLight::new(Tuple::new_point(15., 15., -10.), Color::new(0.2, 0.0, 0.0)).unwrap();
+        PointLight::new(Tuple::new_point(15., 15., -10.), Color::new(0.3, 0.0, 0.0)).unwrap();
 
     let world = World {
         lights: vec![light, light2],
@@ -160,7 +178,7 @@ fn draw_sphere_world() {
             Drawables::Sphere(small_sphere)]
     };
 
-    let mut camera = Camera::new(500, 500, PI / 3.);
+    let mut camera = Camera::new(1000, 1000, PI / 3.);
     camera.transform = Matrix4::new_view_transform(
         Tuple::new_point(0., 1.5, -5.),
         Tuple::new_point(0., 1., 0.),

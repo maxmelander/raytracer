@@ -2,9 +2,10 @@
 // like lighting and shit that doesn't clearly belong to a struct
 // We'll see what happens
 use super::color::Color;
-use super::material::Material;
 use super::point_light::PointLight;
 use super::tuple::Tuple;
+use super::patterns::Pattern;
+use super::generics::{Drawables, Drawable};
 
 pub const EPSILON: f64 = 0.00001;
 
@@ -15,7 +16,7 @@ pub fn is_equal(a: f64, b: f64) -> bool {
 #[allow(dead_code, unused_variables)]
 // Phong lighting
 pub fn lighting(
-    material: Material,
+    object: &Drawables,
     point: Tuple,
     light: PointLight,
     eye_v: Tuple,
@@ -25,8 +26,19 @@ pub fn lighting(
     if point.is_vector() || eye_v.is_point() || normal_v.is_point() {
         return Err("point or vectors not correct format");
     }
+    let material = object.get_shape().material;
+    let color: Color;
 
-    let effective_color = material.color * light.intensity;
+    if let Some(p) = material.pattern {
+        match p.color_at_object(object, point) {
+            Some(c) => color = c,
+            None => return Err("Could not get pattern color at object")
+        }
+    } else {
+        color = material.color;
+    }
+
+    let effective_color = color * light.intensity;
     let ambient = effective_color * material.ambient;
     if in_shadow {
         return Ok(ambient);

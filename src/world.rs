@@ -8,7 +8,7 @@ use super::intersection::Comps;
 use super::ray::Ray;
 use super::utils::lighting;
 use super::intersection::hit;
-use super::generics::{Drawables, Drawable};
+use super::generics::Drawables;
 
 #[allow(dead_code)]
 pub struct World {
@@ -25,7 +25,7 @@ impl World {
             let in_shadow = self.is_shadowed(comps.over_point, light);
 
             if let Ok(result) = lighting(
-                comps.object.get_shape().material,
+                comps.object,
                 comps.over_point,
                 *light,
                 comps.eye_v,
