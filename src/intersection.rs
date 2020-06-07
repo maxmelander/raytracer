@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 use super::utils::{is_equal, EPSILON};
 use super::ray::Ray;
 use super::tuple::Tuple;
-use super::generics::Drawables;
+use super::generics::{Drawables, Drawable};
 
 pub fn float_compare(a: f64, b: f64) -> Ordering {
     if is_equal(a, b) {
@@ -15,7 +15,7 @@ pub fn float_compare(a: f64, b: f64) -> Ordering {
     Ordering::Greater
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Comps<'a> {
     pub t: f64,
     pub object: &'a Drawables,
@@ -23,7 +23,10 @@ pub struct Comps<'a> {
     pub over_point: Tuple,
     pub eye_v: Tuple,
     pub normal_v: Tuple,
+    pub reflect_v: Tuple,
     pub inside: bool,
+    pub n1: f64,
+    pub n2: f64,
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -38,23 +41,52 @@ impl<'a> Intersection<'a> {
         Self { t, object }
     }
 
-    pub fn prepare_computations(&self, ray: Ray) -> Option<Comps> {
+    pub fn prepare_computations(&self, ray: Ray, xs: Option<&Vec<Intersection>>) -> Option<Comps> {
         let t = self.t;
         let object = self.object;
         let point = ray.position(self.t);
-
         let eye_v = -ray.direction;
 
         let mut normal_v = object.normal_at(point)?;
-
         let mut inside = false;
-
         if normal_v.dot(eye_v) < 0.0 {
             inside = true;
             normal_v = -normal_v;
         }
 
+        let reflect_v = ray.direction.reflect(normal_v);
         let over_point = point + normal_v * EPSILON;
+
+        let mut intersections = &vec![*self];
+        if let Some(v) = xs { intersections = v }
+
+
+        let mut n1: f64 = 1.0;
+        let mut n2: f64 = 1.0;
+        let mut containers: Vec<Drawables> = vec![];
+        for i in intersections.iter() {
+            if i == self {
+                if containers.is_empty() {
+                    n1 = 1.0;
+                } else {
+                    n1 = containers.last()?.get_shape().material.refractive_index;
+                }
+            }
+
+            if let Some(index) = containers.iter().position(|&s| s == *i.object) {
+                containers.remove(index);
+            } else {
+                containers.push(*i.object);
+            }
+
+            if i == self {
+                if containers.is_empty() {
+                    n2 = 1.0;
+                } else {
+                    n2 = containers.last()?.get_shape().material.refractive_index;
+                }
+            }
+        }
 
         Some(Comps {
             t,
@@ -63,7 +95,10 @@ impl<'a> Intersection<'a> {
             over_point,
             eye_v,
             normal_v,
+            reflect_v,
             inside,
+            n1,
+            n2
         })
     }
 }

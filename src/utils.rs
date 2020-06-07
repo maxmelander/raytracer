@@ -8,6 +8,7 @@ use super::patterns::Pattern;
 use super::generics::{Drawables, Drawable};
 
 pub const EPSILON: f64 = 0.00001;
+pub const RECURSION_DEPTH: usize = 4;
 
 pub fn is_equal(a: f64, b: f64) -> bool {
     (a - b).abs() < EPSILON

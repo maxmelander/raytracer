@@ -8,17 +8,17 @@ use super::intersection::Comps;
 use super::ray::Ray;
 use super::utils::lighting;
 use super::intersection::hit;
-use super::generics::Drawables;
+use super::generics::{Drawables, Drawable};
 
 #[allow(dead_code)]
 pub struct World {
     pub lights: Vec<PointLight>,
-    pub objects: Vec<Drawables>
+    pub objects: Vec<Drawables>,
 }
 
 #[allow(dead_code)]
 impl World {
-    pub fn shade_hit(&self, comps: Comps) -> Color {
+    pub fn shade_hit(&self, comps: Comps, remaining: usize) -> Color {
         let mut color = Color::new(0., 0., 0.);
 
         for light in self.lights.iter() {
@@ -32,18 +32,22 @@ impl World {
                 comps.normal_v,
                 in_shadow
             ) {
-                color = color + result;
+                let reflected = match self.reflected_color(comps, remaining) {
+                    Ok(r) => r,
+                    Err(_) => Color::new(0., 0., 0.)
+                };
+                color = color + result + reflected;
             }
         }
 
         color
     }
 
-    pub fn color_at(&self, ray: Ray) -> Color {
+    pub fn color_at(&self, ray: Ray, remaining: usize) -> Color {
         let xs = ray.intersect_world(self);
         if let Some(hit) = hit(&xs) {
-            if let Some(comps) = hit.prepare_computations(ray) {
-                return self.shade_hit(comps);
+            if let Some(comps) = hit.prepare_computations(ray, None) {
+                return self.shade_hit(comps, remaining);
             }
         }
         Color::new(0., 0., 0.)
@@ -62,6 +66,22 @@ impl World {
             }
         }
         false
+    }
+
+    pub fn reflected_color(&self, comps: Comps, remaining: usize) -> Result<Color, &'static str> {
+        if remaining < 1 {
+            return Ok(Color::new(0., 0., 0.));
+        }
+
+        let material = comps.object.get_shape().material;
+        if material.reflective == 0.0 {
+            return Ok(Color::new(0., 0., 0.));
+        }
+
+        let reflect_ray = Ray::new(comps.over_point, comps.reflect_v)?;
+        let color = self.color_at(reflect_ray, remaining - 1);
+
+        Ok(color * material.reflective)
     }
 }
 

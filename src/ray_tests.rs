@@ -5,6 +5,7 @@ mod ray_tests {
     use crate::matrix::*;
     use crate::ray::*;
     use crate::sphere::*;
+    use crate::plane::Plane;
     use crate::tuple::*;
     use crate::world::World;
     use crate::generics::Drawables;
@@ -246,7 +247,7 @@ mod ray_tests {
             object: &Drawables::Sphere(shape)
         };
 
-        let comps = i.prepare_computations(r).unwrap();
+        let comps = i.prepare_computations(r, None).unwrap();
 
         assert_eq!(comps.t, i.t);
         assert_eq!(comps.object, i.object);
@@ -265,7 +266,7 @@ mod ray_tests {
             object: &Drawables::Sphere(shape)
         };
 
-        let comps = i.prepare_computations(r).unwrap();
+        let comps = i.prepare_computations(r, None).unwrap();
 
         assert_eq!(comps.inside, false);
     }
@@ -280,12 +281,31 @@ mod ray_tests {
             object: &Drawables::Sphere(shape)
         };
 
-        let comps = i.prepare_computations(r).unwrap();
+        let comps = i.prepare_computations(r, None).unwrap();
         assert_eq!(comps.t, i.t);
         assert_eq!(comps.object, i.object);
         assert_eq!(comps.point, Tuple::new_point(0., 0., 1.));
         assert_eq!(comps.eye_v, Tuple::new_vector(0., 0., -1.));
         assert_eq!(comps.normal_v, Tuple::new_vector(0., 0., -1.));
         assert_eq!(comps.inside, true);
+    }
+
+    #[test]
+    fn precompute_reflective_vector() {
+        let r = Ray::new(
+            Tuple::new_point(0., 1., -1.),
+            Tuple::new_vector(0., -2.0_f64.sqrt()/2.0, 2.0_f64.sqrt()/2.0)
+        ).unwrap();
+
+        let shape = Plane::new();
+
+        let i = Intersection{
+            t: 2.0_f64.sqrt(),
+            object: &Drawables::Plane(shape)
+        };
+
+        let comps = i.prepare_computations(r, None).unwrap();
+
+        assert_eq!(comps.reflect_v, Tuple::new_vector(0.,  2.0_f64.sqrt()/2.0,  2.0_f64.sqrt()/2.0))
     }
 }

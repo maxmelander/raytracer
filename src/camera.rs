@@ -3,6 +3,7 @@ use super::ray::Ray;
 use super::tuple::Tuple;
 use super::world::World;
 use super::canvas::Canvas;
+use super::utils::RECURSION_DEPTH;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Camera {
@@ -62,7 +63,7 @@ impl Camera {
         for y in 0..self.v_size - 1 {
             for x in 0..self.h_size - 1 {
                 let ray = self.ray_for_pixel(x, y)?;
-                let color = world.color_at(ray);
+                let color = world.color_at(ray, RECURSION_DEPTH);
                 canvas.write_pixel(x, y, color)?;
             }
         }

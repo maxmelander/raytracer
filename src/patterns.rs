@@ -3,6 +3,11 @@ use super::tuple::Tuple;
 use super::generics::{Drawables, Drawable};
 use super::matrix::Matrix4;
 
+// TODO: This maybe doesn't have to be an enum and just some structs
+// implementing a trait with a shared struct they hold.
+// But then it would mean the material has to hold a pointer to the pattern because
+// of possible size differences
+
 pub trait Pattern {
     fn color_at(&self, point: Tuple) -> Color;
     fn set_transform(&mut self, transform: Matrix4);

@@ -98,6 +98,7 @@ fn draw_sphere_world() {
     floor.shape.material = Material {
         color: Color::new(1., 0.9, 0.9),
         specular: 0.0,
+        reflective: 0.1,
         pattern: Some(pattern1),
         ..Default::default()
     };
@@ -123,6 +124,7 @@ fn draw_sphere_world() {
         diffuse: 0.7,
         specular: 1.0,
         shininess: 800.,
+        reflective: 0.2,
         ..Default::default()
     };
 
@@ -139,6 +141,7 @@ fn draw_sphere_world() {
         diffuse: 0.7,
         specular: 0.1,
         shininess: 100.,
+        reflective: 0.1,
         pattern: Some(pattern2),
         ..Default::default()
     };
@@ -178,7 +181,7 @@ fn draw_sphere_world() {
             Drawables::Sphere(small_sphere)]
     };
 
-    let mut camera = Camera::new(1000, 1000, PI / 3.);
+    let mut camera = Camera::new(800, 800, PI / 3.);
     camera.transform = Matrix4::new_view_transform(
         Tuple::new_point(0., 1.5, -5.),
         Tuple::new_point(0., 1., 0.),
