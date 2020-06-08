@@ -6,7 +6,7 @@ use super::matrix::Matrix4;
 use super::tuple::Tuple;
 use super::intersection::Comps;
 use super::ray::Ray;
-use super::utils::lighting;
+use super::utils::{lighting, schlick};
 use super::intersection::hit;
 use super::generics::{Drawables, Drawable};
 
@@ -32,12 +32,26 @@ impl World {
                 comps.normal_v,
                 in_shadow
             ) {
-                let reflected = match self.reflected_color(comps, remaining) {
-                    Ok(r) => r,
-                    Err(_) => Color::new(0., 0., 0.)
-                };
-                color = color + result + reflected;
+                color = color + result;
+
             }
+        }
+        let reflected = match self.reflected_color(comps, remaining) {
+            Ok(r) => r,
+            Err(_) => Color::new(0., 0., 0.)
+        };
+
+        let refracted = match self.refracted_color(comps, remaining) {
+            Ok(r) => r,
+            Err(_) => Color::new(0., 0., 0.)
+        };
+
+        let material = comps.object.get_shape().material;
+        if material.reflective > 0.0 && material.transparency > 0.0 {
+            let reflectance = schlick(comps);
+            color = color + (reflected * reflectance) + (refracted * (1.0 - reflectance));
+        } else {
+            color = color + reflected + refracted;
         }
 
         color
@@ -82,6 +96,32 @@ impl World {
         let color = self.color_at(reflect_ray, remaining - 1);
 
         Ok(color * material.reflective)
+    }
+
+    pub fn refracted_color(&self, comps: Comps, remaining: usize) -> Result<Color, &'static str> {
+        if remaining < 1 {
+            return Ok(Color::new(0., 0., 0.));
+        }
+
+        let material = comps.object.get_shape().material;
+        if material.transparency == 0.0 {
+            return Ok(Color::new(0., 0., 0.));
+        }
+
+        // Find total internal reflection using Snell's Law
+        let n_ratio = comps.n1 / comps.n2;
+        let cos_i = comps.eye_v.dot(comps.normal_v);
+        let sin2_t = n_ratio.powf(2.0) * (1.0 - cos_i.powf(2.0));
+
+        if sin2_t > 1.0 {
+            return Ok(Color::new(0., 0., 0.));
+        }
+
+        let cos_t = (1.0 - sin2_t).sqrt();
+        let direction = comps.normal_v * (n_ratio * cos_i - cos_t) - comps.eye_v * n_ratio;
+        let refract_ray = Ray::new(comps.under_point, direction)?;
+
+        Ok(self.color_at(refract_ray, remaining - 1) * comps.object.get_shape().material.transparency)
     }
 }
 

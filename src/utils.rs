@@ -4,11 +4,11 @@
 use super::color::Color;
 use super::point_light::PointLight;
 use super::tuple::Tuple;
-use super::patterns::Pattern;
 use super::generics::{Drawables, Drawable};
+use super::intersection::Comps;
 
 pub const EPSILON: f64 = 0.00001;
-pub const RECURSION_DEPTH: usize = 4;
+pub const RECURSION_DEPTH: usize = 5;
 
 pub fn is_equal(a: f64, b: f64) -> bool {
     (a - b).abs() < EPSILON
@@ -62,4 +62,23 @@ pub fn lighting(
         }
     }
     Ok(ambient + diffuse + specular)
+}
+
+pub fn schlick(comps: Comps) -> f64 {
+    let mut cos = comps.eye_v.dot(comps.normal_v);
+
+    if comps.n1 > comps.n2 {
+        let n = comps.n1 / comps.n2;
+        let sin2_t = n.powf(2.0) * (1.0 - cos.powf(2.0));
+        if sin2_t > 1.0 {
+            return 1.0;
+        }
+
+        let cos_t = (1.0 - sin2_t).sqrt();
+        cos = cos_t;
+    }
+
+    let r0 = ((comps.n1 - comps.n2) / (comps.n1 + comps.n2)).powf(2.0);
+
+    r0 + (1.0 - r0) * (1.0 - cos).powf(5.0)
 }

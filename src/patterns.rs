@@ -22,7 +22,8 @@ pub enum Patterns {
     Stripe(Stripe),
     Gradient(Gradient),
     Ring(Ring),
-    Checker(Checker)
+    Checker(Checker),
+    Test(Test),
 }
 
 
@@ -60,6 +61,12 @@ impl Patterns {
         })
     }
 
+    pub fn new_test() -> Self {
+        Self::Test(Test{
+            transform: Matrix4::new_identity()
+        })
+    }
+
     pub fn color_at_object(&self, object: &Drawables, point: Tuple) -> Option<Color> {
         let object_point = object.get_transform().inverse()? * point;
         let pattern_point = self.get_transform().inverse()? * object_point;
@@ -74,7 +81,8 @@ impl Pattern for Patterns {
             Self::Stripe(s) => s.color_at(point),
             Self::Gradient(g) => g.color_at(point),
             Self::Ring(r) => r.color_at(point),
-            Self::Checker(c) => c.color_at(point)
+            Self::Checker(c) => c.color_at(point),
+            Self::Test(t) => t.color_at(point)
         }
     }
 
@@ -83,7 +91,8 @@ impl Pattern for Patterns {
             Self::Stripe(s) => s.set_transform(transform),
             Self::Gradient(g) => g.set_transform(transform),
             Self::Ring(r) => r.set_transform(transform),
-            Self::Checker(c) => c.set_transform(transform)
+            Self::Checker(c) => c.set_transform(transform),
+            Self::Test(t) => t.set_transform(transform)
         }
     }
 
@@ -92,7 +101,8 @@ impl Pattern for Patterns {
             Self::Stripe(s) => s.get_transform(),
             Self::Gradient(g) => g.get_transform(),
             Self::Ring(r) => r.get_transform(),
-            Self::Checker(c) => c.get_transform()
+            Self::Checker(c) => c.get_transform(),
+            Self::Test(t) => t.get_transform()
         }
     }
 
@@ -101,7 +111,8 @@ impl Pattern for Patterns {
             Self::Stripe(s) => s.get_a(),
             Self::Gradient(g) => g.get_a(),
             Self::Ring(r) => r.get_a(),
-            Self::Checker(c) => c.get_a()
+            Self::Checker(c) => c.get_a(),
+            Self::Test(t) => t.get_a()
         }
     }
 
@@ -110,7 +121,8 @@ impl Pattern for Patterns {
             Self::Stripe(s) => s.get_b(),
             Self::Gradient(g) => g.get_b(),
             Self::Ring(r) => r.get_b(),
-            Self::Checker(c) => c.get_b()
+            Self::Checker(c) => c.get_b(),
+            Self::Test(t) => t.get_b()
         }
     }
 }
@@ -200,4 +212,20 @@ impl Pattern for Checker {
     fn get_transform(&self) -> Matrix4 { self.transform }
     fn get_a(&self) -> Color { self.a }
     fn get_b(&self) -> Color { self.b }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct Test {
+    pub transform: Matrix4,
+}
+
+impl Pattern for Test {
+    fn color_at(&self, point: Tuple) -> Color {
+        Color::new(point.x, point.y, point.z)
+    }
+
+    fn set_transform(&mut self, transform: Matrix4) { self.transform = transform }
+    fn get_transform(&self) -> Matrix4 { self.transform }
+    fn get_a(&self) -> Color { Color::new(0., 0., 0.) }
+    fn get_b(&self) -> Color { Color::new(1., 1., 1.) }
 }

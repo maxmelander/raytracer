@@ -9,6 +9,7 @@ mod ray_tests {
     use crate::tuple::*;
     use crate::world::World;
     use crate::generics::Drawables;
+    use crate::utils::EPSILON;
 
     #[test]
     fn create_ray() {
@@ -307,5 +308,26 @@ mod ray_tests {
         let comps = i.prepare_computations(r, None).unwrap();
 
         assert_eq!(comps.reflect_v, Tuple::new_vector(0.,  2.0_f64.sqrt()/2.0,  2.0_f64.sqrt()/2.0))
+    }
+
+    #[test]
+    fn precompute_under_point() {
+        let r = Ray::new(Tuple::new_point(0., 0., -5.), Tuple::new_vector(0., 0., 1.)).unwrap();
+
+        let mut a = Sphere::new();
+        a.shape.material.transparency = 1.0;
+        a.shape.material.refractive_index = 1.5;
+        a.shape.transform = Matrix4::new_translation(0., 0., 1.);
+
+        let i = Intersection{
+            t: 5.0,
+            object: &Drawables::Sphere(a)
+        };
+
+        let xs = vec![i];
+
+        let comps = i.prepare_computations(r, Some(&xs)).unwrap();
+
+        assert_eq!(comps.under_point.z > EPSILON / 2.0, true);
     }
 }

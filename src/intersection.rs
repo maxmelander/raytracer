@@ -21,6 +21,7 @@ pub struct Comps<'a> {
     pub object: &'a Drawables,
     pub point: Tuple,
     pub over_point: Tuple,
+    pub under_point: Tuple,
     pub eye_v: Tuple,
     pub normal_v: Tuple,
     pub reflect_v: Tuple,
@@ -56,6 +57,7 @@ impl<'a> Intersection<'a> {
 
         let reflect_v = ray.direction.reflect(normal_v);
         let over_point = point + normal_v * EPSILON;
+        let under_point = point - normal_v * EPSILON;
 
         let mut intersections = &vec![*self];
         if let Some(v) = xs { intersections = v }
@@ -93,6 +95,7 @@ impl<'a> Intersection<'a> {
             object,
             point,
             over_point,
+            under_point,
             eye_v,
             normal_v,
             reflect_v,

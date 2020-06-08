@@ -98,7 +98,7 @@ fn draw_sphere_world() {
     floor.shape.material = Material {
         color: Color::new(1., 0.9, 0.9),
         specular: 0.0,
-        reflective: 0.1,
+        reflective: 0.2,
         pattern: Some(pattern1),
         ..Default::default()
     };
@@ -151,16 +151,35 @@ fn draw_sphere_world() {
         Matrix4::new_scaling(0.33, 0.33, 0.33)
     );
 
+    small_sphere.shape.material = Material {
+        color: Color::new(0.0, 0.0, 0.0),
+        diffuse: 0.1,
+        ambient: 0.1,
+        specular: 1.0,
+        shininess: 300.,
+        reflective: 0.9,
+        transparency: 1.0,
+        refractive_index: 1.52,
+        ..Default::default()
+    };
+
+    let mut small_sphere2 = Sphere::new_with_transform(
+        Matrix4::new_translation(0.5, 0.33, -0.75) *
+        Matrix4::new_scaling(0.33, 0.33, 0.33)
+    );
+
     let mut pattern3 = Patterns::new_gradient(Color::new(0.8, 0.0, 0.8), Color::new(0.1,0.1,1.0));
     pattern3.set_transform(
         Matrix4::new_translation(1.0, 0., 0.) *
         Matrix4::new_scaling(2.0, 2.0, 2.0)
     );
-    small_sphere.shape.material = Material {
-        color: Color::new(1.0, 0.2, 0.1),
-        diffuse: 0.7,
-        specular: 0.3,
+
+    small_sphere2.shape.material = Material {
         pattern: Some(pattern3),
+        diffuse: 0.7,
+        specular: 0.7,
+        shininess: 300.,
+        reflective: 0.1,
         ..Default::default()
     };
 
@@ -178,7 +197,8 @@ fn draw_sphere_world() {
             //Drawables::Plane(right_wall),
             Drawables::Sphere(middle_sphere),
             Drawables::Sphere(right_sphere),
-            Drawables::Sphere(small_sphere)]
+            Drawables::Sphere(small_sphere),
+            Drawables::Sphere(small_sphere2)],
     };
 
     let mut camera = Camera::new(800, 800, PI / 3.);

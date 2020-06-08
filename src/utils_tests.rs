@@ -7,6 +7,8 @@ mod utils_tests {
     use crate::color::Color;
     use crate::generics::Drawables;
     use crate::sphere::Sphere;
+    use crate::intersection::Intersection;
+    use crate::ray::Ray;
 
 
     #[test]
@@ -92,5 +94,76 @@ mod utils_tests {
         let in_shadow = true;
         let result = lighting(&sphere, position, light, eye_v, normal_v, in_shadow).unwrap();
         assert_eq!(result, Color::new(0.1, 0.1, 0.1));
+    }
+
+    #[test]
+    fn schlick_total_internal_reflection() {
+        let mut s = Sphere::new();
+        s.shape.material.transparency = 1.0;
+        s.shape.material.refractive_index = 1.5;
+
+        let shape = Drawables::Sphere(s);
+
+        let r = Ray::new(
+            Tuple::new_point(0., 0., -2.0_f64.sqrt()/2.0),
+            Tuple::new_vector(0., 1., 0.)
+        ).unwrap();
+
+        let i1 = Intersection::new(-2.0_f64.sqrt()/2.0, &shape);
+        let i2 = Intersection::new(2.0_f64.sqrt()/2.0, &shape);
+        let xs = vec![i1, i2];
+
+        let comps = i2.prepare_computations(r, Some(&xs)).unwrap();
+
+        let reflectance = schlick(comps);
+
+        assert_eq!(reflectance, 1.0);
+    }
+
+    #[test]
+    fn schlick_perpendicular() {
+        let mut s = Sphere::new();
+        s.shape.material.transparency = 1.0;
+        s.shape.material.refractive_index = 1.5;
+
+        let shape = Drawables::Sphere(s);
+
+        let r = Ray::new(
+            Tuple::new_point(0., 0., 0.),
+            Tuple::new_vector(0., 1., 0.)
+        ).unwrap();
+
+        let i1 = Intersection::new(-1., &shape);
+        let i2 = Intersection::new(1., &shape);
+        let xs = vec![i1, i2];
+
+        let comps = i2.prepare_computations(r, Some(&xs)).unwrap();
+
+        let reflectance = schlick(comps);
+
+        assert_eq!(is_equal(reflectance, 0.04), true);
+    }
+
+    #[test]
+    fn schlick_small_angle_n2_bigger_than_n1() {
+        let mut s = Sphere::new();
+        s.shape.material.transparency = 1.0;
+        s.shape.material.refractive_index = 1.5;
+
+        let shape = Drawables::Sphere(s);
+
+        let r = Ray::new(
+            Tuple::new_point(0., 0.99, -2.),
+            Tuple::new_vector(0., 0., 1.)
+        ).unwrap();
+
+        let i1 = Intersection::new(1.8589, &shape);
+        let xs = vec![i1];
+
+        let comps = i1.prepare_computations(r, Some(&xs)).unwrap();
+
+        let reflectance = schlick(comps);
+
+        assert_eq!(is_equal(reflectance, 0.48873), true);
     }
 }

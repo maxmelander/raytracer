@@ -28,9 +28,11 @@ impl Ray {
         object.intersect(local_ray)
     }
 
-    // NOTE(Optimization); Is it faster to have a fixed size array here, and just not fill it up
+    // NOTE(Optimization): Is it faster to have a fixed size array here, and just not fill it up
     // if we don't get enough intersections?
     // And then live with the fact that we have a limit to how many intersections we can find
+    // Also, it seems unnesseccaaarryyy to have to check every object here if
+    // we can know that the ray is dang far away
     pub fn intersect_world(self, world: &World) -> Vec<Intersection> {
         let mut xs: Vec<Intersection> = vec![];
 
