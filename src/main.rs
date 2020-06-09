@@ -124,7 +124,7 @@ fn draw_sphere_world() {
         diffuse: 0.7,
         specular: 1.0,
         shininess: 800.,
-        reflective: 0.2,
+        reflective: 0.3,
         ..Default::default()
     };
 

@@ -2,15 +2,19 @@ use crate::color::Color;
 
 #[allow(dead_code)]
 pub struct Canvas {
-    data: Vec<Vec<Color>>
+    pub data: Vec<Vec<Color>>
 }
 
 #[allow(dead_code)]
 impl Canvas {
     pub fn new(width: usize, height: usize) -> Self {
-        Self {
-            data: vec![vec![Color::new(0.0, 0.0, 0.0); width]; height]
+        let mut data = vec![vec![Color::new(0.0, 0.0, 0.0); width]; height];
+        for y in 0..height {
+            for x in 0..width {
+                data[y][x] = Color::new(x as f64, y as f64, 0.0);
+            }
         }
+        Self {data}
     }
 
     pub fn data(&self) -> &Vec<Vec<Color>>{

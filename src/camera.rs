@@ -1,3 +1,4 @@
+use rayon::prelude::*;
 use super::matrix::Matrix4;
 use super::ray::Ray;
 use super::tuple::Tuple;
@@ -60,13 +61,14 @@ impl Camera {
     pub fn render(self, world: &World) -> Result<Canvas, &'static str> {
         let mut canvas = Canvas::new(self.h_size, self.v_size);
 
-        for y in 0..self.v_size - 1 {
-            for x in 0..self.h_size - 1 {
-                let ray = self.ray_for_pixel(x, y)?;
-                let color = world.color_at(ray, RECURSION_DEPTH);
-                canvas.write_pixel(x, y, color)?;
-            }
-        }
+        canvas.data.par_iter_mut().flatten().for_each(|e| {
+            let x = e.r;
+            let y = e.g;
+            let ray = self.ray_for_pixel(x as usize, y as usize).unwrap();
+            let color = world.color_at(ray, RECURSION_DEPTH);
+            *e = color;
+        });
+
         Ok(canvas)
     }
 }
